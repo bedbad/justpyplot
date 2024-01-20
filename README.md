@@ -9,10 +9,10 @@ It is measured at 20-100x faster matplotlib.
 Useful for overlaying real-time plots on images and video frames, or
 even 
 
-##INSTALATION:
+##INSTALATION
 
 You can copy plot files respecting the license, or for use in Jupyter notebooks more convienent to:
-```    
+```bash    
         pip install justpyplot
 ```
 ##BASIC USAGE
@@ -22,7 +22,7 @@ flexing or adjusting the plot as you need such as colors, scatter, connected wit
 
 Basically you just create two matching arrays for the dependency you plot and pass it to the justplot with where your plot to be sticked (numpy array, mask in memory, etc) and it does it.
 It's simple to modify the function and contribute to this as you fancy.
-```
+```python
         import numpy as np 
         import cv2
 
