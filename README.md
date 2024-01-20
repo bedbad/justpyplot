@@ -1,5 +1,5 @@
 
-# PLOT IN NUMPY FAST
+# Plot Straight in Numpy, Fast
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
 the plot scale and size to fit the input data.
