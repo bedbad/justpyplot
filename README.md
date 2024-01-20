@@ -1,4 +1,4 @@
-![Plot in Numpy Fast](https://giphy.com/embed/Golhlo06fa2Q5EM0o5.gif)
+![Plot in Numpy Fast](https://giphy.com/embed/Golhlo06fa2Q5EM0o5)
 # PLOT IN NUMPY FAST
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
@@ -9,9 +9,9 @@ It is measured at 20-100x faster matplotlib.
 Useful for overlaying real-time plots on images and video frames, or
 in jupyter.
 ## MOTIVATION
-Doing dances around matplotlib by getting figures not auto displayed, converting figure bytearray to numpy(which is different by
-backend, i.e OS = surprising behavior on different platforms)
-to suffering multimillisecond performance hit just didn't do it for me.
+Doing dances around matplotlib by getting figures not auto displayed, converting figure bytearray to numpy (which is different by
+backend, i.e surprising  behavior on different platforms), or using moviepy, etc all
+to suffering multimillisecond performance hit just didn't do it for me. I needed plots to measure and see real things happening. 
 This repo is to see if there is enough need/pain out there to make that right.
 
 ## INSTALATION
