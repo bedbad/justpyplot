@@ -1,5 +1,6 @@
 
 # Plot Straight in Numpy, Fast
+Just plot your values directly into NumPy array.
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
 the plot scale and size to fit the input data.
