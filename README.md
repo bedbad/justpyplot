@@ -1,4 +1,4 @@
-![Plot in Numpy Fast](https://giphy.com/embed/Golhlo06fa2Q5EM0o5)
+![Plot in Numpy Fast](sinus.gif)
 # PLOT IN NUMPY FAST
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
