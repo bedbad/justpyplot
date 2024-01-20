@@ -3,16 +3,22 @@
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
 the plot scale and size to fit the input data.
-Plots fast - the policy is no single loop in the code,
-even if when you connect points with line segments etc,
+Plots fast - the ironclad policy of no single loop in critical path,
+not even for fanciness like thickness for connecting line segments
 It is measured at 20-100x faster matplotlib.
+```
+timer "full justpyplot + rendering": avg 382 µs ± 135 µs, max 962 µs
+```
 Useful for overlaying real-time plots on images and video frames, or
 in jupyter.
 ## MOTIVATION
 Doing dances around matplotlib by getting figures not auto displayed, converting figure bytearray to numpy (which is different by
 backend, i.e surprising  behavior on different platforms), or using moviepy, etc all
 to suffering multimillisecond performance hit just didn't do it for me. I needed plots to measure and see real things happening. 
-This repo is to see if there is enough need/pain out there to make that right.
+
+This code is a quick example for people who want to see how to do things in vectorized way.
+
+If there's enough pain with matplotlib points above maybe it will be taken to a level.
 
 ## INSTALATION
 
@@ -31,9 +37,8 @@ Basically you just create two matching arrays for the dependency you plot and pa
 import numpy as np 
 import cv2
 
-import plot as ap
+import justpyplot as jplt
 
-t0 = time.perf_counter()
 
 xs, ys = [], []
 c = 0
@@ -46,8 +51,8 @@ while(c != 27):
     frame = np.full((500,470,3), (255,255,255), dtype=np.uint8)
     
     vals = np.array(ys)
-    with _plottimer:
-        drawn = ap.just_plot(frame, vals,title="sin() from Clock")
+
+    drawn = jplt.just_plot(frame, vals,title="sin() from Clock")
     
     cv2.imshow('frame', drawn)
     c = cv2.waitKey(1)

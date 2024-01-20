@@ -60,7 +60,7 @@ def vectorized_lines_with_thickness(y0, x0, y1, x1, img_array, thickness, clr=(0
 def just_plot(img_array: np.array, 
                        values: np.array,
                        title: str = "Measuring", 
-                       offset: Tuple[int, int] = (100, 100), 
+                       offset: Tuple[int, int] = (50, 50), 
                        size: Tuple[int, int] = (300,270), 
                        clr: Tuple[int, int, int] = (0, 0, 255), 
                        r = 2,
@@ -68,6 +68,8 @@ def just_plot(img_array: np.array,
                        precision: int = 2, 
                        default_font_size: float = .75, 
                        default_font_size_small: float = .5,
+                       scatter = False,
+                       thickness = 2,
                        opacity: float = 1.0,
                        max_len: int = 100) -> np.array:
     """Adaptively draw a plot on a NumPy image array.
@@ -179,10 +181,10 @@ def just_plot(img_array: np.array,
     # Assign color to the corresponding pixels and the surrounding pixels
     img_array[yy, xx] = point_color
 
-    if (values.shape[0]>=2):
+    if (not scatter and values.shape[0]>=2):
         # Create pairs of adjacent points
         with _veclinesperf:
-            img_array = vectorized_lines_with_thickness(y[:-1], x[:-1], y[1:], x[1:],img_array,clr=(255,0,0), thickness=2)
+            img_array = vectorized_lines_with_thickness(y[:-1], x[:-1], y[1:], x[1:],img_array,clr=(255,0,0), thickness=thickness)
 
     #rendering text
     font_size_small = default_font_size_small
@@ -190,7 +192,7 @@ def just_plot(img_array: np.array,
     tick_color = clr
     for i in range(n + 1):
         # Scale the tick label by the multiplier
-        val = "{:.{}f}".format((scale / n * i - shift) * multiplier, precision)
+        val = "{:.{}f}".format((scale / n * i) * multiplier, precision)
         text_size, _ = cv2.getTextSize(val, font, font_size_small, 1)
         text_width, text_height = text_size
         text_x = top_left[0] - text_width - 5  # Adjust position to the left of the grid
