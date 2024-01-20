@@ -13,7 +13,7 @@ even
 
 You can copy plot files respecting the license, or for use in Jupyter notebooks more convienent to:
 ```bash    
-        pip install justpyplot
+pip install justpyplot
 ```
 ##BASIC USAGE
 
