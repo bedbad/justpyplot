@@ -1,5 +1,5 @@
-# PLOT IN NUMPY FAST
 ![Plot in Numpy Fast](https://giphy.com/embed/Golhlo06fa2Q5EM0o5)
+# PLOT IN NUMPY FAST
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
 the plot scale and size to fit the input data.
@@ -7,7 +7,12 @@ Plots fast - the policy is no single loop in the code,
 even if when you connect points with line segments etc,
 It is measured at 20-100x faster matplotlib.
 Useful for overlaying real-time plots on images and video frames, or
-even 
+in jupyter.
+## MOTIVATION
+Doing dances around matplotlib by getting figures not auto displayed, converting figure bytearray to numpy(which is different by
+backend, i.e OS = surprising behavior on different platforms)
+to suffering multimillisecond performance hit just didn't do it for me.
+This repo is to see if there is enough need/pain out there to make that right.
 
 ## INSTALATION
 
@@ -20,8 +25,7 @@ pip install justpyplot
 You can explore the documentation for the justplot function currently, options probably support any 
 flexing or adjusting the plot as you need such as colors, scatter, connected with line thickness, labels, etc
 
-Basically you just create two matching arrays for the dependency you plot and pass it to the justplot with where your plot to be sticked (numpy array, mask in memory, etc) and it does it.
-It's simple to modify the function and contribute to this as you fancy.
+Basically you just create two matching arrays for the dependency you plot and pass it to the justplot with where your plot to be sticked (numpy array, mask in memory, etc) and it does it. Adjust your function .
 ```python
 import numpy as np 
 import cv2
