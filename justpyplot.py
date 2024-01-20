@@ -1,4 +1,4 @@
-# import cv2
+# Copyright (c) 2023 bedbad
 import numpy as np
 from typing import Tuple, List
 

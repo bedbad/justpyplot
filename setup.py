@@ -1,3 +1,4 @@
+# Copyright (c) 2023 bedbad
 from setuptools import setup, find_packages
 
 setup(

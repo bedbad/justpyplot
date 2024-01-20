@@ -18,7 +18,7 @@ to suffering multimillisecond performance hit just didn't do it for me. I needed
 
 This code is a quick example for people who want to see how to do things in vectorized way.
 
-If there's enough pain with matplotlib points above maybe it will be taken to a level.
+If there's enough pain with matplotlib points above maybe it will be taken to a public usage level.
 
 ## INSTALATION
 
