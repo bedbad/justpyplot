@@ -1,4 +1,4 @@
-![Plot in Numpy Fast](sinus.gif)
+
 # PLOT IN NUMPY FAST
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
@@ -21,6 +21,7 @@ You can copy plot files respecting the license, or for use in Jupyter notebooks 
 pip install justpyplot
 ```
 ## BASIC USAGE
+![Plot in Numpy Fast](sinus.gif)
 
 You can explore the documentation for the justplot function currently, options probably support any 
 flexing or adjusting the plot as you need such as colors, scatter, connected with line thickness, labels, etc
