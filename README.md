@@ -1,4 +1,4 @@
-#PLOT IN NUMPY FAST
+# PLOT IN NUMPY FAST
 ![Plot in Numpy Fast](https://giphy.com/embed/Golhlo06fa2Q5EM0o5)
 
 Justpyplot plots given `values` to a given NumPy ndarray, adapting
@@ -9,13 +9,13 @@ It is measured at 20-100x faster matplotlib.
 Useful for overlaying real-time plots on images and video frames, or
 even 
 
-##INSTALATION
+## INSTALATION
 
 You can copy plot files respecting the license, or for use in Jupyter notebooks more convienent to:
 ```bash    
 pip install justpyplot
 ```
-##BASIC USAGE
+## BASIC USAGE
 
 You can explore the documentation for the justplot function currently, options probably support any 
 flexing or adjusting the plot as you need such as colors, scatter, connected with line thickness, labels, etc
