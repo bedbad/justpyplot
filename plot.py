@@ -2,7 +2,7 @@
 import numpy as np
 from typing import Tuple, List
 
-
+import cv2
 from perf_timer import PerfTimer
 
 
@@ -57,20 +57,49 @@ def vectorized_lines_with_thickness(y0, x0, y1, x1, img_array, thickness, clr=(0
     img_array[y_shifted.ravel(), x_shifted.ravel()] = clr
     return img_array
 
-def draw_adaptive_plot(img_array: np.array, 
+def just_plot(img_array: np.array, 
                        values: np.array,
-                       title: str = "Measure Tracing", 
-                       offset: Tuple[int, int] = (50, 50), 
-                       size: Tuple[int, int] = (300, 270), 
+                       title: str = "Measuring", 
+                       offset: Tuple[int, int] = (100, 100), 
+                       size: Tuple[int, int] = (300,270), 
                        clr: Tuple[int, int, int] = (0, 0, 255), 
                        r = 2,
                        pxdelta: int = 15, 
                        precision: int = 2, 
-                       default_font_size: int = 3, 
-                       default_font_size_small: int = 2,
+                       default_font_size: float = .75, 
+                       default_font_size_small: float = .5,
                        opacity: float = 1.0,
-                       max_len: int = -1) -> np.array:
+                       max_len: int = 100) -> np.array:
+    """Adaptively draw a plot on a NumPy image array.
 
+        Plots given `values` to a given NumPy ndarray, adapting
+        the plot scale and size to fit the input data.
+        Plots fast - no single loop in the code, even if you want to connect points with
+        line segments, measured 20-100x faster then matplotlib.
+        Useful for overlaying real-time plots on images and video frames.
+
+        Args:
+            img_array: NumPy ndarray to draw the plot on, likely a video frame
+            values: NumPy 1D array of values to plot over time
+            title: Plot title string  
+            offset: (x, y) offset tuple for the top-left of plot 
+            size: (width, height) tuple for plot size in pixels
+            clr: (R, G, B) tuple for plot color
+            pxdelta: Grid size in pixels 
+            precision: Floating point precision for y-axis labels  
+            default_font_size: Font size for title   
+            default_font_size_small: Font size for axis labels
+            opacity: Opacity value 0-1 for plot elements
+            max_len: Maximum history length for values array
+
+        Returns:
+            img_array: Image array with overlaid adaptive plot
+
+        Example:
+            frame = cv2.imread('frame.jpg') 
+            values = sensor_data[-100:]
+            frame = draw_adaptive_plot(frame, values)
+        """
     min_val = np.min(values)
     max_val = np.max(values)
     
@@ -161,18 +190,18 @@ def draw_adaptive_plot(img_array: np.array,
     tick_color = clr
     for i in range(n + 1):
         # Scale the tick label by the multiplier
-        val = "{:.{}f}".format((scale / n * i) * multiplier, precision)
-        text_size, _ = cv2.getTextSize(val, font, font_size_small / 3, 1)
+        val = "{:.{}f}".format((scale / n * i - shift) * multiplier, precision)
+        text_size, _ = cv2.getTextSize(val, font, font_size_small, 1)
         text_width, text_height = text_size
         text_x = top_left[0] - text_width - 5  # Adjust position to the left of the grid
         text_y = bottom_right[1] - i * 2 * pxdelta + pxdelta // 2
-        cv2.putText(img_array, val, (text_x, text_y), font, font_size_small / 3, tick_color, 1)
+        cv2.putText(img_array, val, (text_x, text_y), font, font_size_small, tick_color, 1)
 
     # Draw title with opacity
     title_color = clr
-    text_size_title = cv2.getTextSize(title, font, font_size / 3, 1)[0]
+    text_size_title = cv2.getTextSize(title, font, font_size, 1)[0]
     text_x_title = top_left[0] + width // 2 - text_size_title[0] // 2
     text_y_title = top_left[1] - text_size_title[1] - pxdelta // 2
-    cv2.putText(img_array, title, (text_x_title, text_y_title), font, font_size / 3, title_color, 1)
+    cv2.putText(img_array, title, (text_x_title, text_y_title), font, font_size, title_color, 1)
 
     return img_array
