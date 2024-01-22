@@ -37,13 +37,11 @@ Basically you just create two matching arrays for the dependency you plot and pa
 ```python
 import numpy as np 
 import cv2
-
+import time
 import justpyplot as jplt
 
-
 xs, ys = [], []
-c = 0
-while(c != 27):
+while(cv2.waitKey(1) != 27):
     xt = time.perf_counter() - t0
     yx = np.sin(xt)
     xs.append(xt)
@@ -53,8 +51,7 @@ while(c != 27):
     
     vals = np.array(ys)
 
-    drawn = jplt.just_plot(frame, vals,title="sin() from Clock")
+    plotted_in_array = jplt.just_plot(frame, vals,title="sin() from Clock")
     
-    cv2.imshow('frame', drawn)
-    c = cv2.waitKey(1)
+    cv2.imshow('np array plot', plotted_in_array)
 ```

@@ -34,6 +34,34 @@ def vectorized_lines(y0, x0, y1, x1, img_array, clr=(0,0,255)):
     return img_array
 
 def vectorized_lines_with_thickness(y0, x0, y1, x1, img_array, thickness, clr=(0, 0, 255)):
+    """
+    Draw multiple lines with specified thickness on an image array.
+
+    This function uses vectorized operations to draw lines between pairs of points
+    defined by corresponding elements in the x0, y0 (start points) and x1, y1 (end points)
+    arrays. It modifies the input image array in-place by setting the color of the pixels
+    along the lines to the specified color.
+
+    Parameters:
+    y0 (np.ndarray): An array of y-coordinates for the start points of the lines.
+    x0 (np.ndarray): An array of x-coordinates for the start points of the lines.
+    y1 (np.ndarray): An array of y-coordinates for the end points of the lines.
+    x1 (np.ndarray): An array of x-coordinates for the end points of the lines.
+    img_array (np.ndarray): The image array on which to draw the lines. This array will be modified in-place.
+    thickness (int): The thickness of the lines to be drawn.
+    clr (tuple): A tuple of three integers representing the color of the lines in BGR (blue, green, red) format.
+
+    Returns:
+    np.ndarray: The modified image array with the lines drawn on it.
+
+    Example:
+    >>> img = np.zeros((100, 100, 3), dtype=np.uint8)
+    >>> y0 = np.array([10, 20])
+    >>> x0 = np.array([10, 20])
+    >>> y1 = np.array([80, 80])
+    >>> x1 = np.array([80, 30])
+    >>> vectorized_lines_with_thickness(y0, x0, y1, x1, img, 3, (255, 0, 0))
+    """
     # Create an array of distances
     num_points = max(np.max(abs(x1 - x0)), np.max(abs(y1 - y0))) + 1
     t = np.linspace(0, 1, num_points)
@@ -152,7 +180,7 @@ def just_plot(img_array: np.array,
     img_array[top_left[1]:bottom_right[1]+1:pxdelta, top_left[0]:bottom_right[0]+1,:] = grid_color
     img_array[top_left[1]:bottom_right[1]+1, top_left[0]:bottom_right[0]+1:pxdelta,:] = grid_color
 
- # Render points with opacity
+    # Render points 
     point_color = clr
 
     # Create an array of indices
