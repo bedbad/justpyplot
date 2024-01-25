@@ -51,7 +51,7 @@ while(cv2.waitKey(1) != 27):
     
     vals = np.array(ys)
 
-    plotted_in_array = jplt.just_plot(frame, vals,title="sin() from Clock")
+    plotted_in_array = jplt.plot1(frame, vals,title="sin() from Clock")
     
     cv2.imshow('np array plot', plotted_in_array)
 ```
