@@ -740,7 +740,7 @@ def plot1_at(
     bottom_right = (offset[0] + width, offset[1] + height)
 
     font_size = default_font_size
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    font = cv2.FONT_HERSHEY_
 
     # Draw grid and rectangle with opacity
     img_array[top_left[1]:bottom_right[1]+1:pxdelta, top_left[0]:bottom_right[0]+1,:] = grid_color
@@ -791,13 +791,13 @@ def plot1_at(
         text_width, text_height = text_size
         text_x = top_left[0] - text_width  # Adjust position to the left of the grid
         text_y = bottom_right[1] - i * 2 * pxdelta + pxdelta // 2
-        cv2.putText(img_array, val, (text_x, text_y), font, font_size_small, tick_color, 1)
+        cv2.putText(img_array, val, (text_x, text_y), font, font_size_small, tick_color, 3)
 
     # Draw title with opacity
     title_color = label_color
     text_size_title = cv2.getTextSize(title, font, font_size, 1)[0]
     text_x_title = top_left[0] + width // 2 - text_size_title[0] // 2
     text_y_title = top_left[1] - text_size_title[1] - pxdelta // 2
-    cv2.putText(img_array, title, (text_x_title, text_y_title), font, font_size, title_color, 1)
+    cv2.putText(img_array, title, (text_x_title, text_y_title), font, font_size, title_color, 3)
 
     return img_array

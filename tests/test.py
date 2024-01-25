@@ -6,7 +6,7 @@ import time
 import cv2
 
 import perf_timer
-import justpyplot as jplt
+from justpyplot import justpyplot as jplt
 
 _plottimer = perf_timer.PerfTimer('full justpyplot + rendering')
 
