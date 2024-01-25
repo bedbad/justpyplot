@@ -1,6 +1,6 @@
 
 # Plot Straight in Numpy, Fast
-![Plot in Numpy Fast](demo.gif)
+![Plot in Numpy Fast](resources/demo.gif)
 
 This is concept of the real-time, vectorized plotting library
 which gets your plot as a numpy array controlling every basic part
@@ -34,7 +34,7 @@ For use in Jupyter notebooks its convienent to:
 pip install justpyplot
 ```
 ## BASIC USAGE
-
+![Basic Usage](resources/sinus.gif)
 
 You can explore the documentation for the justplot function currently, options probably support any  flexing or adjusting the plot as you need such as colors, scatter, connected with line thickness, labels, etc
 
