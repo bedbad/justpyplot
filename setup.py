@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='justpyplot',
-    version='0.1',
+    version='0.1.1',
     packages=find_packages(),
     install_requires=[
         'numpy',
@@ -16,10 +16,10 @@ setup(
                      ''' display anyhow you would display an array image,'''
                      ''' save as usual plot, or record in a movie that is too fast to see''',
     long_description_content_type='text/markdown',
-    url='https://github.com/your_username/your_package',
+    url='https://github.com/bedbad/justpyplot',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
     ],
 )
