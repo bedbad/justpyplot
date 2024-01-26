@@ -50,7 +50,7 @@ You can plot on exiting image frame at specified offset by plot1_at, plot2_at fu
 import numpy as np 
 import cv2
 import time
-import justpyplot as jplt
+from justpyplot import justpyplot as jplt
 
 xs, ys = [], []
 while(cv2.waitKey(1) != 27):
