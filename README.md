@@ -1,16 +1,19 @@
 
-# Plot Straight in Numpy, Fast
+<h1 align="center"># Plot in Numpy, Debug Visually Real-Time</h1>
+<p align="center">
 ![Plot in Numpy Fast](resources/demo.gif)
+</p>
 
 This is concept of the real-time, vectorized plotting library
 which gets your plot as a numpy array controlling every basic part
 of it you may need - including opacity;
-All plots can adapt to values ranges and distributions real-time;
+All plots can adapt to values ranges real-time;
 
 Consequently allows for all kinds of visual debugging, overlaying, 
 tweaking and streaming.
 
-It is measured at 20-100x faster matplotlib.
+Also it allows direct simple access to all elemntal properties and 
+is measured at 20-100x faster then matplotlib.
 ```
 timer "full justpyplot + rendering": avg 382 µs ± 135 µs, max 962 µs
 ```
@@ -34,6 +37,7 @@ For use in Jupyter notebooks its convienent to:
 pip install justpyplot
 ```
 ## BASIC USAGE
+
 ![Basic Usage](resources/sinus.gif)
 
 You can explore the documentation for the justplot function currently, options probably support any  flexing or adjusting the plot as you need such as colors, scatter, connected with line thickness, labels, etc
