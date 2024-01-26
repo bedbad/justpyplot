@@ -1,7 +1,9 @@
 
 <h1 align="center"># Plot in Numpy, Debug Visually Real-Time</h1>
 <p align="center">
+
 ![Plot in Numpy Fast](resources/demo.gif)
+
 </p>
 
 This is concept of the real-time, vectorized plotting library
