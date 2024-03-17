@@ -18,16 +18,16 @@ timer "full justpyplot + rendering": avg 382 µs ± 135 µs, max 962 µs
 ```
 
 ## MOTIVATION
-Python plotting Status Quo, matplotlib and other major libs that copy it require 
-3-6 step ![hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get  the numpy array of __figures__, __grid__, __axis__ and __labels__ from your data you'd like to plot. 
+Python Plotting status quo: matplotlib and other major libs that copy it
+need 3-6 step [hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get as simple numpy arrays __figures__, __grid__, __axis__ and __labels__ of your plot. 
 
-The status quo basically requires you to screenshot and convert img data back to pixel tensor makes you suffer multimillisecond performance hit.
+The status quo basically requires you to _screenshot_ in memory and buffer byter data back to pixel/img tensor. That makes you suffer multimillisecond performance hit _every plot frame_
 
-Obviously it's very unpleasant to write such hoopla if you need it to take care of your python plots tweaking/publishing/rendering/gifing etc.. yourself and it's not fit for real-time aspect of what you plot, such as testing and debugging, physical/manual manipulation of CV/camera/mechanical setup.
+Obviously it's very unpleasant to write such hoopla if you want to frab your plot frames. \
+Having plot frames you can do tweaking/publishing/rendering/GIFing etc.. yourself and, _importantly for computer vision_, it's too much a performance looser for real-time aspect of what you plot, such as testing and debugging, physical/manual manipulation of CV/camera/mechanical setup.
 
-Because it's hermetic python plotlib rewrite it doesn't suffer from other matplotlib vices.
-Also!
-This code is a quick example for people who want to see how to do things in vectorized way.
+Also: it is a hermetic python plotlib rewrite  - it doesn't suffer from other matplotlib vices.\
+Also: this code is an instance of plotting/rendering done in vectorized way which is important in ML/AI industry - the plot workflow can be directly embedded in visual neural networks
 
 If there's enough demand here for real-time plotting, visual debugging for camera/computer vision applications and quick image graphs, I will  a solid level of this library, with more competitive basic feature set to that of matplotlib.
 
