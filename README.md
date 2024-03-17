@@ -12,7 +12,7 @@ of it you may need - including opacity;
 It's useful if you want to take control of your plot rendering/recording in your own hands for grab your plots directly for __overlaying__, GIFing
 visual debugging, tweaking, streaming, etc; It allows direct control and access img masks of 4 elemental properties of plot:  __figures__, __grid__, __axis__ and __labels__
 
-Also it is measured at 20-100x faster then matplotlib.
+It measured at 20-100x performance of matplotlib.
 ```
 timer "full justpyplot + rendering": avg 382 µs ± 135 µs, max 962 µs
 ```
