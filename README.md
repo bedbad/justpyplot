@@ -7,28 +7,29 @@
 
 This is concept of the real-time, vectorized plotting library
 which gets your plot as a numpy array controlling every basic part
-of it you may need - including opacity;
-All plots can adapt to values ranges real-time;
+of it you may need - including opacity; 
 
-Consequently allows for all kinds of visual debugging, overlaying, 
-tweaking and streaming.
+It's useful if you want to take control of your plot rendering/recording in your own hands for grab your plots directly for __overlaying__, GIFing
+visual debugging, tweaking, streaming, etc; It allows direct control and access img masks of 4 elemental properties of plot:  __figures__, __grid__, __axis__ and __labels__
 
-Also it allows direct simple access to all elemntal properties and 
-is measured at 20-100x faster then matplotlib.
+It measured at 20-100x performance of matplotlib.
 ```
 timer "full justpyplot + rendering": avg 382 µs ± 135 µs, max 962 µs
 ```
 
 ## MOTIVATION
-Status Quo, i.e. the matplotlib and close require 
-5-6 step ![hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get numpy array image of plot from your data. It's on par with screenshotting after displaying you plot or going into monitor buffers for plot portion image. That makes you suffer multimillisecond performance hit. Obvioudly it's very unpleasant and abnormal to ever write such hoopla and it is unworkable if you need to and for tweaking the images and more importantly real-time application, such as visual debugging of computer vision or physical camera applications.
+Python Plotting status quo: matplotlib and other major libs that copy it
+need 3-6 step [hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get as simple numpy arrays __figures__, __grid__, __axis__ and __labels__ of your plot. 
 
-Luckily it took me less time to write this to satisfy every plotting every basic plotting need then to make matplotlib to work like this.
+The status quo basically requires you to _screenshot_ in memory and buffer byter data back to pixel/img tensor. That makes you suffer multimillisecond performance hit _every plot frame_
 
-Also!
-This code is a quick example for people who want to see how to do things in vectorized way.
+Obviously it's very unpleasant to write such hoopla if you want to frab your plot frames. \
+Having plot frames you can do tweaking/publishing/rendering/GIFing etc.. yourself and, _importantly for computer vision_, it's too much a performance looser for real-time aspect of what you plot, such as testing and debugging, physical/manual manipulation of CV/camera/mechanical setup.
 
-If you, the reader, communicate enough need for real-time plotting, visual debugging for camera/computer vision applications and quick image graphs, I will take this library to a solid level, with competitive feature set.
+Also: it is a hermetic python plotlib rewrite  - it doesn't suffer from other matplotlib vices.\
+Also: this code is an instance of plotting/rendering done in vectorized way which is important in ML/AI industry - the plot workflow can be directly embedded in visual neural networks
+
+If there's enough demand here for real-time plotting, visual debugging for camera/computer vision applications and quick image graphs, I will  a solid level of this library, with more competitive basic feature set to that of matplotlib.
 
 ## INSTALATION
 
