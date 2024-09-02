@@ -2,7 +2,7 @@
 <h1 align="center"># Why not just get your plots in numpy?! </h1>
 Why not just have a simple plot1(values,size,title, scatter=True, pt_color, ...) -> np.ndarray 
 
-function API which gives your plot (__figures__, __grid__, __axis__,__labels__ if needed) in any way you tell it to
+function API which gives your plot (__figures__, __grid__, __axis__,__labels__ if needed) in any way you tell it to?
 
 And then you take that and overlay, mask, stretch, transform and render at wherever in frame array/canvas/memory you need?
 
