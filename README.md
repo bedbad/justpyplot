@@ -1,12 +1,29 @@
 
 <h1 align="center"># Why not just get your plots in numpy?! </h1>
-Why not just have a simple plot1(values,size,title, scatter=True, pt_color, ...) -> np.ndarray
-function API that gives your plot (and other graph parts) in any way you tell it to and then use that, stick or overlay however you like?
+Why not just have a simple plot1(values,size,title, scatter=True, pt_color, ...) -> np.ndarray 
 
-I implemented that here and in 3 lines of code you can stick graph things on your work such as this:
+function API which gives your plot (__figures__, __grid__, __axis__,__labels__ if needed) in any way you tell it to
+
+And then you take that and overlay, mask, stretch, transform and render at wherever in frame array/canvas/memory you need?
+
+Here I took this function concept and stuck it upon running mug neural network in 3 lines of code to see how it performs in reality in details:
 <p align="center">
   <img src="resources/demo.gif">
 </p>
+
+```
+                jplt.plot1_at(image, ang_zs,
+                            title='Angle from Z axis', offset=(50,50), size=(270, 300),
+                            point_color=(255,0,0),line_color=(255,0,0), label_color=(255,0,0), grid_color=(126,126,126))
+                jplt.plot1_at(image, ang_ys,
+                              title='Angle from Y axis', offset=(400,50), size=(270, 300),
+                              point_color=(0,255,0), line_color=(0,255,0),label_color=(0,255,0), grid_color=(126,126,126),
+                              scatter=False)
+                jplt.plot1_at(image,ang_xs,
+                              title='Angle from X axis', offset=(750,50), size=(270, 300),
+                              point_color=(0,0,255), line_color=(0,0,255),label_color=(0,0,255), grid_color=(126,126,126),
+                              scatter=False)
+```
 
 It measured at 20-100x performance of matplotlib.
 ```
