@@ -6,7 +6,7 @@ function API which gives your plot (__figures__, __grid__, __axis__,__labels__ i
 
 And then you take that and overlay, mask, stretch, transform and render at wherever in frame array/canvas/memory you need?
 
-Here I took this function concept and stuck it upon running mug neural network in 3 lines of code to see how it performs in reality in details (try in examples/demo.py):
+Here I took this function concept and stuck it upon running mug neural network in 3 lines of code to mess with that detector in physical reality (try in examples/demo.py):
 <p align="center">
   <img src="resources/demo.gif">
 </p>
