@@ -75,6 +75,7 @@ import cv2
 import time
 from justpyplot import justpyplot as jplt
 
+t0=time.perf_counter()
 xs, ys = [], []
 while(cv2.waitKey(1) != 27):
     xt = time.perf_counter() - t0
@@ -82,11 +83,8 @@ while(cv2.waitKey(1) != 27):
     xs.append(xt)
     ys.append(yx)
     
-    frame = np.full((500,470,3), (255,255,255), dtype=np.uint8)
-    
     vals = np.array(ys)
-
-    plotted_in_array = jplt.plot1(frame, vals,title="sin() from Clock")
+    plotted_array = jplt.plot1(vals,title="sin() from Clock")
     
-    cv2.imshow('np array plot', plotted_in_array)
+    cv2.imshow('np array plot', plotted_array)
 ```
