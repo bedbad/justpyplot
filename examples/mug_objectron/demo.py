@@ -6,7 +6,6 @@ from scipy.spatial.transform import Rotation as R
 
 from justpyplot import justpyplot as jplt
 
-import screeninfo
 
 #Most popular - Macbook Air "13, in centimenters
 # px_sz = 0.01119
