@@ -38,8 +38,8 @@ It showed useful in robotics and in general if you want to take control of your 
 visual debugging, tweaking, streaming, etc; It allows direct control and access img masks of 4 elemental properties of plot:  __figures__, __grid__, __axis__ and __labels__
 
 ## WHY USE IT
-Python Plotting status quo: matplotlib and other major libs that copy it
-need 3 to 6 steps [hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get your plot data in easy format (as simple numpy arrays) such as __figures__, __grid__, __axis__ and __labels__ of your plot. 
+Python Plotting status quo: matplotlib (and its copys)
+need 3 to 6 steps [hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get your plot's __figures__, __grid__, __axis__ and __labels__ in easy tensor/array format (such as simple ndarray)    
 
 The status quo basically requires you to _screenshot_ in memory and buffer plot bytes back to pixel/img tensor. That makes you suffer multimillisecond performance hit _every single frame_
 
