@@ -69,11 +69,11 @@ def adjust_values_maxlen(values, grid_shape, max_len):
     if value_range[0] == 0:
         value_range[0] = values[0]
         median_degree[0]=0
-    elif value_range[1] == 0:
+    if value_range[1] == 0:
         value_range[1] = values[1]
         median_degree[1]=0
-    else:
-        median_degree = np.round(np.log10(np.median(values, axis=1))).astype(int)
+    if value_range[0] and value_range[1]:
+        median_degree = np.round(np.log10(np.median(np.abs(values), axis=1))).astype(int)
 
 
 
