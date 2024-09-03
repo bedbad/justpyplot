@@ -41,19 +41,21 @@ visual debugging, tweaking, streaming, etc; It allows direct control and access 
 Python Plotting status quo: matplotlib and other major libs that copy it
 need 3 to 6 steps [hoopla](https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array/77853862#77853862) to get your plot data in easy format (as simple numpy arrays) such as __figures__, __grid__, __axis__ and __labels__ of your plot. 
 
-The status quo basically requires you to _screenshot_ in memory and buffer byter data back to pixel/img tensor. That makes you suffer multimillisecond performance hit _every plot frame_
+The status quo basically requires you to _screenshot_ in memory and buffer plot bytes back to pixel/img tensor. That makes you suffer multimillisecond performance hit _every single frame_
 
-Obviously it's very unpleasant to write such hoopla if you want to grab your plot datas frame by frame. \
+Obviously it's very unpleasant. \
 Having plot frames you can do tweaking/publishing/rendering/GIFing etc.. yourself and, _importantly for computer vision_, it's too much a performance looser for real-time aspect of what you plot, such as physical/robotic testing and debugging, physical/manual manipulation of CV/camera/mechanical setup.
 
 Also: it is a hermetic python plotlib rewrite  - it doesn't suffer from other matplotlib vices.\
 Also: this code is an instance of plotting/rendering done in vectorized way which is important in ML/AI industry - the plot workflow can be directly embedded in visual neural networks
 
-If there's enough demand here for real-time plotting, visual debugging for camera/computer vision applications and quick image graphs, I will  a solid level of this library, with more competitive basic feature set to that of matplotlib.
+It's useful in robotics where you have a physical feedback loop based on the dependency you're plotting when you manipulating it by hand such as steering the drone. It can be very useful for real-time plotting, visual debugging for camera/computer vision applications and generally as composable rewrite if a python plotting lib.
+
+Feel free to contribute/take over at this point.
 
 ## INSTALATION
 
-You can copy justplot file code respecting the license;
+You can copy justpyplot.py file code respecting the license;
 For use in Jupyter notebooks its convienent to:
 ```bash    
 pip install justpyplot
