@@ -1,0 +1,52 @@
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
+
+[project]
+name='justpyplot'
+version='0.1.1'
+authors=[{ name='bedbad',email='antonyuk@bu.edu'}]
+description='Get your plot in you array, plot fast'
+readme='README.md'
+classifiers=[
+  'Programming Language :: Python :: 3',
+  'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+  'Operating System :: OS Independent',
+]
+Repository='https://github.com/bedbad/justpyplot'
+dependencies=[
+  'numpy',
+  'opencv-python',
+]
+
+[project.optional-dependencies]
+demo=[
+  'mediapipe',
+  'scipy'
+]
+dev = [
+    'ruff>=0.0.279',  # Specify the Ruff version
+]
+
+[tool.ruff]
+line-length = 88
+
+lint.ignore = [
+    "W191",  # tab-indentation
+    "E111",  # indentation-with-invalid-multiple
+    "E114",  # indentation-with-invalid-multiple-comment
+    "E117",  # over-indented
+    "D206",  # indent-with-spaces
+    "D300",  # triple-single-quotes
+    "Q000",  # bad-quotes-inline-string
+    "Q001",  # bad-quotes-multiline-string
+    "Q002",  # bad-quotes-docstring
+    "Q003",  # avoidable-escaped-quote
+    "COM812",  # missing-trailing-comma
+    "COM819",  # prohibited-trailing-comma
+    "ISC001",  # single-line-implicit-string-concatenation
+    "ISC002",  # multi-line-implicit-string-concatenation
+]
+
+[tool.ruff.format]
+quote-style='single'
