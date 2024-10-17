@@ -1,6 +1,6 @@
 # Copyright (c) 2023 bedbad
 import numpy as np
-from typing import Tuple
+from typing import Tuple, Optional
 
 import cv2
 from perf_timer import PerfTimer
@@ -1266,12 +1266,16 @@ def plot1_components(
     thickness=2,
     line_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
     max_len: int = 100,
+    bounds: np.ndarray = None,
+    *args,
+    **kwargs
 ) -> Tuple[np.array, np.array, np.array, np.array]:
     """
     Create a plot and return its components as separate NumPy arrays.
 
     Args:
         (same as plot1 function)
+        bounds: Optional[np.ndarray], custom bounds for the plot (shape: (2, 2) for min/max of x and y)
 
     Returns:
         Tuple[np.array, np.array, np.array, np.array]: 
@@ -1281,34 +1285,10 @@ def plot1_components(
             - title_img: The title image
     """
     if max_len > 0:
-        values = values[-max_len:]
+        values = values[:, -max_len:]
     
-    min_val = np.min(values)
-    max_val = np.max(values)
-
-    # Calculate adjustment factor and shift
-    if max_val - min_val == 0:
-        if min_val == 0:
-            scale = 1.0
-            shift = -0.5
-            power = 1
-            adjust_factor = 1
-        else:
-            scale = min_val / 2
-            power = np.floor(np.log10(min_val))
-            adjust_factor = 1
-            shift = -scale
-    else:
-        scale = max_val - min_val
-        power = np.ceil(np.log10((np.abs(min_val) + np.abs(max_val)) / 2))
-        shift = -min_val
-
-    multiplier = 10**-power
-
-    title += f', 10^{int(power)}'
-
     # Estimate margins and grid size
-    margin_ver = int(size[1] * 0.1)  # 10% of height for vertical margin
+    margin_ver = int(size[1] * 0.15)  # 15% of height for vertical margin
     margin_hor = int(size[0] * 0.15)  # 15% of width for horizontal margin
     grid_topleft = np.array((margin_hor, margin_ver))
     grid_botright = np.array(size) - grid_topleft
@@ -1323,14 +1303,43 @@ def plot1_components(
     
     pxdelta = (gsize // nticks).astype(int)
 
+    if bounds is None:
+        bounds = np.array([
+            [np.min(values[0]), np.min(values[1])],
+            [np.max(values[0]), np.max(values[1])]
+        ])
+    else:
+        bounds = np.array(bounds, copy=True)
+        # Ensure bounds cover both dimensions
+        if bounds.shape != (2, 2):
+            raise ValueError("Bounds should have shape (2, 2) for min/max of x and y")
+        
+        # If any bound is None, calculate it from the values
+        for i in range(2):
+            if bounds[i, 0] is None:
+                bounds[i, 0] = np.min(values[i])
+            if bounds[i, 1] is None:
+                bounds[i, 1] = np.max(values[i])
+
+    value_range = bounds[:,1] - bounds[:,0]
+    scale = gsize[::-1] / value_range
+    
+    # Correct the broadcasting for adjusted_values
+    adjusted_values = (values - bounds[:,0][:, np.newaxis]) * scale[:, np.newaxis]
+
+    # Calculate the order of magnitude for each bound
+    magnitude = np.floor(np.log10(np.abs(bounds).astype(float)))
+    # Take the maximum magnitude for each dimension
+    max_magnitude = np.max(magnitude, axis=0)
+
+    # Update title with the power of 10 for the y-axis (second dimension)
+    title += f', 10^{int(max_magnitude[1])}'
+
     # Create separate image arrays for each component
     figure = np.zeros((*size, 4), np.uint8)
     grid = np.zeros((*size, 4), np.uint8)
     labels = np.zeros((*size, 4), np.uint8)
     title_img = np.zeros((*size, 4), np.uint8)
-
-    adjust_factor = gsize[0] / scale
-    adjusted_values = (values + shift) * adjust_factor
 
     # Draw grid
     grid[
@@ -1345,9 +1354,8 @@ def plot1_components(
     ] = grid_color
 
     # Render points
-    i = np.arange(len(adjusted_values[0]))  # Use first row of adjusted_values
-    x = grid_botright[1] - ((i + 1) * gsize[1] // len(adjusted_values[0]))
-    y = grid_botright[0] - adjusted_values[1].astype(int)  # Use second row of adjusted_values
+    x = grid_topleft[1] + adjusted_values[0].astype(int)
+    y = grid_botright[0] - adjusted_values[1].astype(int)
 
     valid_mask = (
         (grid_topleft[0] <= y) &
@@ -1369,13 +1377,10 @@ def plot1_components(
 
     figure[yy, xx] = point_color
 
-    if not scatter and values.shape[0] >= 2:
+    if not scatter and values.shape[1] >= 2:
         with _veclinesperf:
             figure = vectorized_lines_with_thickness(
-                y[:-1],
-                x[:-1],
-                y[1:],
-                x[1:],
+                y[:-1], x[:-1], y[1:], x[1:],
                 figure,
                 clr=line_color,
                 thickness=thickness,
@@ -1384,11 +1389,26 @@ def plot1_components(
     # Render y-axis labels
     tick_color = label_color[:3]  # Remove alpha channel for vectorized_text
     for i in range(nticks + 1):
-        val = '{:.{}f}'.format((scale / nticks * i) * multiplier, precision)
+        tick_value = bounds[0, 1] + (value_range[1] * i / nticks)
+        val = '{:.{}f}'.format(tick_value, precision)
         l = len(val)
         dx = int(l * 5 * default_font_size_small * 2)
         text_x = grid_topleft[1] - dx  # Approximate text width
-        text_y = grid_botright[0] - i * pxdelta[0] - 5 * int(default_font_size_small)  # Adjust for text height
+        text_y = grid_botright[0] - i * pxdelta[0] - int(5 * default_font_size_small)  # Adjust for text height
+        
+        labels = vectorized_text(
+            labels, val, (text_x, text_y), color=tick_color, font_size=default_font_size_small
+        )
+
+    # Render x-axis labels
+    for i in range(nticks + 1):
+        tick_value = bounds[0, 0] + (value_range[0] * i / nticks)
+        val = '{:.{}f}'.format(tick_value, precision)
+        l = len(val)
+        dy = int(5 * default_font_size_small * 2)
+        text_x = grid_topleft[1] + i * pxdelta[1] - int(l * 2.5 * default_font_size_small)  # Center text
+        text_y = grid_botright[0] + dy  # Position below x-axis
+        
         labels = vectorized_text(
             labels, val, (text_x, text_y), color=tick_color, font_size=default_font_size_small
         )
