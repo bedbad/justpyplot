@@ -716,8 +716,8 @@ def plot1(
     nticks: int = 16,
     grid_color: Tuple[int, int, int, int] = (128, 128, 128, 255),
     precision: int = 2,
-    default_font_size: float = 0.5,
-    default_font_size_small: float = 0.4,
+    default_font_size: float = 0.8,
+    default_font_size_small: float = 0.6,
     label_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
     scatter=True,
     thickness=2,
@@ -756,11 +756,11 @@ def plot1(
         values = sensor_data[-100:]
         plot_img = plot1(values, title="Sensor Data")
     """
-    min_val = np.min(values)
-    max_val = np.max(values)
-
     if max_len > 0:
         values = values[-max_len:]
+    
+    min_val = np.min(values)
+    max_val = np.max(values)
 
     # Calculate adjustment factor and shift
     if max_val - min_val == 0:
@@ -784,8 +784,8 @@ def plot1(
     title += f', 10^{int(power)}'
 
     # Estimate text sizes and positions
-    font_size = default_font_size * 0.4  # Adjust this factor as needed
-    font_size_small = default_font_size_small * 0.4  # Adjust this factor as needed
+    font_size = default_font_size  # Adjust this factor as needed
+    font_size_small = default_font_size_small  # Adjust this factor as needed
     
     # Estimate margins and grid size
     margin_ver = int(size[1] * 0.1)  # 10% of height for vertical margin
@@ -862,8 +862,10 @@ def plot1(
     tick_color = label_color[:3]  # Remove alpha channel for vectorized_text
     for i in range(nticks + 1):
         val = '{:.{}f}'.format((scale / nticks * i) * multiplier, precision)
-        text_x = grid_topleft[1] - len(val) * 5 * int(font_size_small * 2)  # Approximate text width
-        text_y = grid_botright[0] - i * pxdelta[0] + 5 * int(font_size_small * 2)  # Adjust for text height
+        l = len(val)
+        dx = int(l * 5 * font_size_small * 2)
+        text_x = grid_topleft[1] - dx  # Approximate text width
+        text_y = grid_botright[0] - i * pxdelta[0] - 5 * int(font_size_small)  # Adjust for text height
         img_array = vectorized_text(
             img_array, val, (text_x, text_y), color=tick_color, font_size=font_size_small
         )
@@ -871,7 +873,7 @@ def plot1(
     # Draw title
     title_color = label_color[:3]  # Remove alpha channel for vectorized_text
     text_x_title = grid_topleft[1] + (grid_botright[1] - grid_topleft[1]) // 2 - len(title) * 5 * int(font_size * 2) // 2  # Approximate text width
-    text_y_title = 15
+    text_y_title = grid_topleft[0] - int(font_size * 5*2)
     img_array = vectorized_text(
         img_array, title, (text_x_title, text_y_title), color=title_color, font_size=font_size
     )
@@ -1247,3 +1249,156 @@ def plot1_at(
     )
 
     return img_array
+
+def plot1_components(
+    values: np.array,
+    title: str = 'Measuring',
+    size: Tuple[int, int] = (300, 300),
+    point_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
+    r=2,
+    nticks: int = 16,
+    grid_color: Tuple[int, int, int, int] = (128, 128, 128, 255),
+    precision: int = 2,
+    default_font_size: float = 0.8,
+    default_font_size_small: float = 0.6,
+    label_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
+    scatter=True,
+    thickness=2,
+    line_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
+    max_len: int = 100,
+) -> Tuple[np.array, np.array, np.array, np.array]:
+    """
+    Create a plot and return its components as separate NumPy arrays.
+
+    Args:
+        (same as plot1 function)
+
+    Returns:
+        Tuple[np.array, np.array, np.array, np.array]: 
+            - figure: The main plot content (points and lines)
+            - grid: The grid lines
+            - labels: The axis labels
+            - title_img: The title image
+    """
+    if max_len > 0:
+        values = values[-max_len:]
+    
+    min_val = np.min(values)
+    max_val = np.max(values)
+
+    # Calculate adjustment factor and shift
+    if max_val - min_val == 0:
+        if min_val == 0:
+            scale = 1.0
+            shift = -0.5
+            power = 1
+            adjust_factor = 1
+        else:
+            scale = min_val / 2
+            power = np.floor(np.log10(min_val))
+            adjust_factor = 1
+            shift = -scale
+    else:
+        scale = max_val - min_val
+        power = np.ceil(np.log10((np.abs(min_val) + np.abs(max_val)) / 2))
+        shift = -min_val
+
+    multiplier = 10**-power
+
+    title += f', 10^{int(power)}'
+
+    # Estimate margins and grid size
+    margin_ver = int(size[1] * 0.1)  # 10% of height for vertical margin
+    margin_hor = int(size[0] * 0.15)  # 15% of width for horizontal margin
+    grid_topleft = np.array((margin_hor, margin_ver))
+    grid_botright = np.array(size) - grid_topleft
+    gsize = grid_botright - grid_topleft
+    
+    # Adjust grid size to be divisible by nticks
+    gsize2 = gsize - (gsize % nticks)
+    iota = (gsize - gsize2) / 2
+    grid_topleft = (grid_topleft + iota).astype(int)
+    grid_botright = (grid_botright - iota).astype(int)
+    gsize = gsize2
+    
+    pxdelta = (gsize // nticks).astype(int)
+
+    # Create separate image arrays for each component
+    figure = np.zeros((*size, 4), np.uint8)
+    grid = np.zeros((*size, 4), np.uint8)
+    labels = np.zeros((*size, 4), np.uint8)
+    title_img = np.zeros((*size, 4), np.uint8)
+
+    adjust_factor = gsize[0] / scale
+    adjusted_values = (values + shift) * adjust_factor
+
+    # Draw grid
+    grid[
+        grid_topleft[0] : grid_botright[0] + 1 : pxdelta[0],
+        grid_topleft[1] : grid_botright[1] + 1,
+        :,
+    ] = grid_color
+    grid[
+        grid_topleft[0] : grid_botright[0] + 1,
+        grid_topleft[1] : grid_botright[1] + 1 : pxdelta[1],
+        :,
+    ] = grid_color
+
+    # Render points
+    i = np.arange(len(adjusted_values[0]))  # Use first row of adjusted_values
+    x = grid_botright[1] - ((i + 1) * gsize[1] // len(adjusted_values[0]))
+    y = grid_botright[0] - adjusted_values[1].astype(int)  # Use second row of adjusted_values
+
+    valid_mask = (
+        (grid_topleft[0] <= y) &
+        (y <= grid_botright[0]) &
+        (grid_topleft[1] <= x) &
+        (x <= grid_botright[1])
+    )
+    valsx = x[valid_mask]
+    valsy = y[valid_mask]
+    x_offset = np.arange(-r, r + 1)
+    y_offset = np.arange(-r, r + 1)
+    xx, yy = np.meshgrid(x_offset, y_offset)
+
+    xx = xx.ravel() + valsx[:, None]
+    yy = yy.ravel() + valsy[:, None]
+
+    xx = xx.ravel()
+    yy = yy.ravel()
+
+    figure[yy, xx] = point_color
+
+    if not scatter and values.shape[0] >= 2:
+        with _veclinesperf:
+            figure = vectorized_lines_with_thickness(
+                y[:-1],
+                x[:-1],
+                y[1:],
+                x[1:],
+                figure,
+                clr=line_color,
+                thickness=thickness,
+            )
+
+    # Render y-axis labels
+    tick_color = label_color[:3]  # Remove alpha channel for vectorized_text
+    for i in range(nticks + 1):
+        val = '{:.{}f}'.format((scale / nticks * i) * multiplier, precision)
+        l = len(val)
+        dx = int(l * 5 * default_font_size_small * 2)
+        text_x = grid_topleft[1] - dx  # Approximate text width
+        text_y = grid_botright[0] - i * pxdelta[0] - 5 * int(default_font_size_small)  # Adjust for text height
+        labels = vectorized_text(
+            labels, val, (text_x, text_y), color=tick_color, font_size=default_font_size_small
+        )
+
+    # Draw title
+    title_color = label_color[:3]  # Remove alpha channel for vectorized_text
+    text_x_title = grid_topleft[1] + (grid_botright[1] - grid_topleft[1]) // 2 - len(title) * 5 * int(default_font_size * 2) // 2  # Approximate text width
+    text_y_title = grid_topleft[0] - int(default_font_size * 5*2)
+    title_img = vectorized_text(
+        title_img, title, (text_x_title, text_y_title), color=title_color, font_size=default_font_size
+    )
+
+    return figure, grid, labels, title_img
