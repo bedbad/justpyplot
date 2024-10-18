@@ -1252,6 +1252,7 @@ def plot1_at(
 
 def plot1_components(
     values: np.array,
+    bounds: Optional[np.ndarray] = None,
     title: str = 'Measuring',
     size: Tuple[int, int] = (300, 300),
     point_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
@@ -1266,7 +1267,6 @@ def plot1_components(
     thickness=2,
     line_color: Tuple[int, int, int, int] = (0, 0, 255, 255),
     max_len: int = 100,
-    bounds: np.ndarray = None,
     *args,
     **kwargs
 ) -> Tuple[np.array, np.array, np.array, np.array]:
@@ -1305,8 +1305,8 @@ def plot1_components(
 
     if bounds is None:
         bounds = np.array([
-            [np.min(values[0]), np.min(values[1])],
-            [np.max(values[0]), np.max(values[1])]
+            [np.min(values[0]), np.max(values[0])],
+            [np.min(values[1]), np.max(values[1])]
         ])
     else:
         bounds = np.array(bounds, copy=True)
@@ -1358,10 +1358,10 @@ def plot1_components(
     y = grid_botright[0] - adjusted_values[1].astype(int)
 
     valid_mask = (
-        (grid_topleft[0] <= y) &
-        (y <= grid_botright[0]) &
-        (grid_topleft[1] <= x) &
-        (x <= grid_botright[1])
+        (grid_topleft[0] < y) &
+        (y < grid_botright[0]) &
+        (grid_topleft[1] < x) &
+        (x < grid_botright[1])
     )
     valsx = x[valid_mask]
     valsy = y[valid_mask]
@@ -1389,7 +1389,7 @@ def plot1_components(
     # Render y-axis labels
     tick_color = label_color[:3]  # Remove alpha channel for vectorized_text
     for i in range(nticks + 1):
-        tick_value = bounds[0, 1] + (value_range[1] * i / nticks)
+        tick_value = bounds[1, 0] + (value_range[1] * i / nticks)
         val = '{:.{}f}'.format(tick_value, precision)
         l = len(val)
         dx = int(l * 5 * default_font_size_small * 2)
@@ -1422,3 +1422,209 @@ def plot1_components(
     )
 
     return figure, grid, labels, title_img
+
+def plot_dict(
+    values: np.array,
+    grid: Optional[dict] = None,
+    figure: Optional[dict] = None,
+    bounds: Optional[np.ndarray] = None,
+    title: str = 'Measuring',
+    size: Tuple[int, int] = (300, 300),
+    max_len: int = 100,
+    *args,
+    **kwargs
+) -> Tuple[np.array, np.array, np.array, np.array]:
+    """
+    Create a plot and return its components as separate NumPy arrays.
+
+    Args:
+        values: np.array, the data to plot
+        grid: Optional[dict], styling options for the grid
+        figure: Optional[dict], styling options for the figure
+        bounds: Optional[np.ndarray], custom bounds for the plot (shape: (2, 2) for min/max of x and y)
+        title: str, title of the plot
+        size: Tuple[int, int], size of the plot
+        max_len: int, maximum number of data points to plot
+
+    Returns:
+        Tuple[np.array, np.array, np.array, np.array]: 
+            - figure: The main plot content (points and lines)
+            - grid: The grid lines
+            - labels: The axis labels
+            - title_img: The title image
+    """
+    # Default values from plot1_components
+    default_grid = {
+        'nticks': 16,
+        'color': (128, 128, 128, 255),
+        'label_color': (0, 0, 255, 255),
+        'label_font_size': 0.6,
+        'precision': 2
+    }
+
+    default_figure = {
+        'scatter': True,
+        'point_color': (0, 0, 255, 255),
+        'point_radius': 2,
+        'line_color': (0, 0, 255, 255),
+        'line_thickness': 2,
+        'marker_style': 'circle',
+        'line_style': 'solid'
+    }
+
+    # Create new dicts with defaults, updated by user-provided values
+    grid_style = default_grid.copy()
+    if grid is not None:
+        grid_style.update(grid)
+
+    figure_style = default_figure.copy()
+    if figure is not None:
+        figure_style.update(figure)
+
+    if max_len > 0:
+        values = values[:, -max_len:]
+    
+    # Extract grid options
+    nticks = grid_style['nticks']
+    grid_color = grid_style['color']
+    label_color = grid_style['label_color']
+    label_font_size = grid_style['label_font_size']
+    precision = grid_style['precision']
+
+    # Extract figure options
+    scatter = figure_style['scatter']
+    point_color = figure_style['point_color']
+    r = figure_style['point_radius']
+    line_color = figure_style['line_color']
+    thickness = figure_style['line_thickness']
+    marker_style = figure_style['marker_style']
+    line_style = figure_style['line_style']
+
+    # Estimate margins and grid size
+    margin_ver = int(size[1] * 0.15)
+    margin_hor = int(size[0] * 0.15)
+    grid_topleft = np.array((margin_hor, margin_ver))
+    grid_botright = np.array(size) - grid_topleft
+    gsize = grid_botright - grid_topleft
+    
+    # Adjust grid size to be divisible by nticks
+    gsize2 = gsize - (gsize % nticks)
+    iota = (gsize - gsize2) / 2
+    grid_topleft = (grid_topleft + iota).astype(int)
+    grid_botright = (grid_botright - iota).astype(int)
+    gsize = gsize2
+    
+    pxdelta = (gsize // nticks).astype(int)
+
+    if bounds is None:
+        bounds = np.array([
+            [np.min(values[0]), np.max(values[0])],
+            [np.min(values[1]), np.max(values[1])]
+        ])
+    else:
+        bounds = np.array(bounds, copy=True)
+        if bounds.shape != (2, 2):
+            raise ValueError("Bounds should have shape (2, 2) for min/max of x and y")
+        
+        for i in range(2):
+            if bounds[i, 0] is None:
+                bounds[i, 0] = np.min(values[i])
+            if bounds[i, 1] is None:
+                bounds[i, 1] = np.max(values[i])
+
+    value_range = bounds[:,1] - bounds[:,0]
+    scale = gsize[::-1] / value_range
+    
+    adjusted_values = (values - bounds[:,0][:, np.newaxis]) * scale[:, np.newaxis]
+
+    magnitude = np.floor(np.log10(np.abs(bounds).astype(float)))
+    max_magnitude = np.max(magnitude, axis=0)
+
+    title += f', 10^{int(max_magnitude[1])}'
+
+    figure_img = np.zeros((*size, 4), np.uint8)
+    grid_img = np.zeros((*size, 4), np.uint8)
+    labels_img = np.zeros((*size, 4), np.uint8)
+    title_img = np.zeros((*size, 4), np.uint8)
+
+    # Draw grid
+    grid_img[
+        grid_topleft[0] : grid_botright[0] + 1 : pxdelta[0],
+        grid_topleft[1] : grid_botright[1] + 1,
+        :,
+    ] = grid_color
+    grid_img[
+        grid_topleft[0] : grid_botright[0] + 1,
+        grid_topleft[1] : grid_botright[1] + 1 : pxdelta[1],
+        :,
+    ] = grid_color
+
+    # Render points
+    x = grid_topleft[1] + adjusted_values[0].astype(int)
+    y = grid_botright[0] - adjusted_values[1].astype(int)
+
+    valid_mask = (
+        (grid_topleft[0] < y) &
+        (y < grid_botright[0]) &
+        (grid_topleft[1] < x) &
+        (x < grid_botright[1])
+    )
+    valsx = x[valid_mask]
+    valsy = y[valid_mask]
+    x_offset = np.arange(-r, r + 1)
+    y_offset = np.arange(-r, r + 1)
+    xx, yy = np.meshgrid(x_offset, y_offset)
+
+    xx = xx.ravel() + valsx[:, None]
+    yy = yy.ravel() + valsy[:, None]
+
+    xx = xx.ravel()
+    yy = yy.ravel()
+
+    figure_img[yy, xx] = point_color
+
+    if not scatter and values.shape[1] >= 2:
+        with _veclinesperf:
+            figure_img = vectorized_lines_with_thickness(
+                y[:-1], x[:-1], y[1:], x[1:],
+                figure_img,
+                clr=line_color,
+                thickness=thickness,
+            )
+
+    # Render y-axis labels
+    tick_color = label_color[:3]
+    for i in range(nticks + 1):
+        tick_value = bounds[1, 0] + (value_range[1] * i / nticks)
+        val = '{:.{}f}'.format(tick_value, precision)
+        l = len(val)
+        dx = int(l * 5 * label_font_size * 2)
+        text_x = grid_topleft[1] - dx
+        text_y = grid_botright[0] - i * pxdelta[0] - int(5 * label_font_size)
+        
+        labels_img = vectorized_text(
+            labels_img, val, (text_x, text_y), color=tick_color, font_size=label_font_size
+        )
+
+    # Render x-axis labels
+    for i in range(nticks + 1):
+        tick_value = bounds[0, 0] + (value_range[0] * i / nticks)
+        val = '{:.{}f}'.format(tick_value, precision)
+        l = len(val)
+        dy = int(5 * label_font_size * 2)
+        text_x = grid_topleft[1] + i * pxdelta[1] - int(l * 2.5 * label_font_size)
+        text_y = grid_botright[0] + dy
+        
+        labels_img = vectorized_text(
+            labels_img, val, (text_x, text_y), color=tick_color, font_size=label_font_size
+        )
+
+    # Draw title
+    title_color = label_color[:3]
+    text_x_title = grid_topleft[1] + (grid_botright[1] - grid_topleft[1]) // 2 - len(title) * 5 * int(label_font_size * 2) // 2
+    text_y_title = grid_topleft[0] - int(label_font_size * 5*2)
+    title_img = vectorized_text(
+        title_img, title, (text_x_title, text_y_title), color=title_color, font_size=label_font_size
+    )
+
+    return figure_img, grid_img, labels_img, title_img
