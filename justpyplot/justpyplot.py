@@ -1537,10 +1537,10 @@ def plot_dict(
     
     adjusted_values = (values - bounds[:,0][:, np.newaxis]) * scale[:, np.newaxis]
 
-    magnitude = np.floor(np.log10(np.abs(bounds).astype(float)))
-    max_magnitude = np.max(magnitude, axis=0)
+    y_scale = scale[1] if scale.ndim == 2 else scale
+    y_magnitude = 0 if np.all(y_scale == 0) else int(np.floor(np.log10(np.abs(y_scale[y_scale != 0]).max())))
 
-    title += f', 10^{int(max_magnitude[1])}'
+    title += f', 10^{y_magnitude}'
 
     figure_img = np.zeros((*size, 4), np.uint8)
     grid_img = np.zeros((*size, 4), np.uint8)
@@ -1563,26 +1563,6 @@ def plot_dict(
     x = grid_topleft[1] + adjusted_values[0].astype(int)
     y = grid_botright[0] - adjusted_values[1].astype(int)
 
-    valid_mask = (
-        (grid_topleft[0] < y) &
-        (y < grid_botright[0]) &
-        (grid_topleft[1] < x) &
-        (x < grid_botright[1])
-    )
-    valsx = x[valid_mask]
-    valsy = y[valid_mask]
-    x_offset = np.arange(-r, r + 1)
-    y_offset = np.arange(-r, r + 1)
-    xx, yy = np.meshgrid(x_offset, y_offset)
-
-    xx = xx.ravel() + valsx[:, None]
-    yy = yy.ravel() + valsy[:, None]
-
-    xx = xx.ravel()
-    yy = yy.ravel()
-
-    figure_img[yy, xx] = point_color
-
     if not scatter and values.shape[1] >= 2:
         with _veclinesperf:
             figure_img = vectorized_lines_with_thickness(
@@ -1591,6 +1571,52 @@ def plot_dict(
                 clr=line_color,
                 thickness=thickness,
             )
+            
+    valid_mask = (
+        (grid_topleft[0] <= y) & (y < grid_botright[0]) &
+        (grid_topleft[1] <= x) & (x < grid_botright[1])
+    )
+    valsx = x[valid_mask]
+    valsy = y[valid_mask]
+    
+    marker_style = figure_style.get('marker_style', 'circle')
+    
+    if marker_style == 'circle':
+        x_offset = np.arange(-r, r + 1)
+        y_offset = np.arange(-r, r + 1)
+        xx, yy = np.meshgrid(x_offset, y_offset)
+        mask = xx**2 + yy**2 <= r**2
+    elif marker_style == 'square':
+        x_offset = np.arange(-r, r + 1)
+        y_offset = np.arange(-r, r + 1)
+        xx, yy = np.meshgrid(x_offset, y_offset)
+        mask = np.ones_like(xx, dtype=bool)
+    elif marker_style == 'triangle':
+        x_offset = np.arange(-r, r + 1)
+        y_offset = np.arange(-r, r + 1)
+        xx, yy = np.meshgrid(x_offset, y_offset)
+        mask = (yy <= 0) & (xx + yy >= -r) & (-xx + yy >= -r)
+    elif marker_style == 'cross':
+        x_offset = np.arange(-r, r + 1)
+        y_offset = np.arange(-r, r + 1)
+        xx, yy = np.meshgrid(x_offset, y_offset)
+        mask = (xx == 0) | (yy == 0)
+    else:
+        # Default to circle if unsupported style is specified
+        x_offset = np.arange(-r, r + 1)
+        y_offset = np.arange(-r, r + 1)
+        xx, yy = np.meshgrid(x_offset, y_offset)
+        mask = xx**2 + yy**2 <= r**2
+
+    xx = xx[mask]
+    yy = yy[mask]
+
+    xx = xx.reshape(1, -1) + valsx.reshape(-1, 1)
+    yy = yy.reshape(1, -1) + valsy.reshape(-1, 1)
+
+    valid_points = (0 <= xx) & (xx < figure_img.shape[1]) & (0 <= yy) & (yy < figure_img.shape[0])
+    figure_img[yy[valid_points], xx[valid_points]] = point_color
+
 
     # Render y-axis labels
     tick_color = label_color[:3]
