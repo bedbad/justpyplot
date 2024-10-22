@@ -3,12 +3,31 @@ import numpy as np
 from typing import Tuple, Optional
 
 import cv2
-from perf_timer import PerfTimer
+
 from .textrender import vectorized_text
+import functools
 
+if __debug__:
+    from perf_timer import PerfTimer
+    perf_timers = {
+       '_veclinesperf' : PerfTimer('vectorized lines render'),
+        '_plotperf' : PerfTimer('full plot rendering')
+    }
+else:
+    perf_timers = {}
 
-_veclinesperf = PerfTimer('vectorized lines render')
-
+def debug_performance(perf_name:str):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            if __debug__ and perf_name in perf_timers:
+                with perf_timers[perf_name]:
+                    result = func(*args, **kwargs)
+                return result
+            else:
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 def adjust_values(values, grid_shape):
     """
@@ -117,6 +136,7 @@ def vectorized_line(y0, x0, y1, x1, canvas_size, thickness):
     return mask
 
 
+@debug_performance('_veclinesperf')
 def vectorized_lines(y0, x0, y1, x1, img_array, clr=(0, 0, 255)):
     """
     Draw vectorized lines on an image array.
@@ -143,6 +163,7 @@ def vectorized_lines(y0, x0, y1, x1, img_array, clr=(0, 0, 255)):
     return img_array
 
 
+@debug_performance('_veclinesperf')
 def vectorized_lines_with_thickness(
     y0, x0, y1, x1, img_array, thickness, clr=(0, 0, 255)
 ):
@@ -356,6 +377,7 @@ def plot2_at(
     return img_array
 
 
+@debug_performance('_plotperf')
 def plot2(
     values: np.array,
     title: str = 'Measuring',
@@ -517,6 +539,7 @@ def plot2(
     return img_array
 
 
+@debug_performance('_plotperf')
 def plot1_cv(
     values: np.array,
     title: str = 'Measuring',
@@ -707,6 +730,7 @@ def plot1_cv(
     )
     return img_array
 
+@debug_performance('_plotperf')
 def plot1(
     values: np.array,
     title: str = 'Measuring',
@@ -902,6 +926,7 @@ def blend_at(
     return dst_img
 
 
+@debug_performance('_plotperf')
 def plot1_atcv(
     img_array: np.ndarray,
     values: np.ndarray,
@@ -1078,6 +1103,7 @@ def plot1_atcv(
 
     return img_array
 
+@debug_performance('_plotperf')
 def plot1_at(
     img_array: np.ndarray,
     values: np.ndarray,
@@ -1250,6 +1276,7 @@ def plot1_at(
 
     return img_array
 
+@debug_performance('_plotperf')
 def plot1_components(
     values: np.array,
     bounds: Optional[np.ndarray] = None,
@@ -1423,6 +1450,7 @@ def plot1_components(
 
     return figure, grid, labels, title_img
 
+@debug_performance('_plotperf')
 def plot_dict(
     values: np.array,
     grid: Optional[dict] = None,
@@ -1564,13 +1592,13 @@ def plot_dict(
     y = grid_botright[0] - adjusted_values[1].astype(int)
 
     if not scatter and values.shape[1] >= 2:
-        with _veclinesperf:
-            figure_img = vectorized_lines_with_thickness(
-                y[:-1], x[:-1], y[1:], x[1:],
-                figure_img,
-                clr=line_color,
-                thickness=thickness,
-            )
+        # with _veclinesperf:
+        figure_img = vectorized_lines_with_thickness(
+            y[:-1], x[:-1], y[1:], x[1:],
+            figure_img,
+            clr=line_color,
+            thickness=thickness,
+        )
             
     valid_mask = (
         (grid_topleft[0] <= y) & (y < grid_botright[0]) &
