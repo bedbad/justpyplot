@@ -360,7 +360,14 @@ FONT = {
         [0,0,0,1,0],
         [0,0,0,0,1]
     ]),
-    ' ': np.zeros((5, 5))
+    ' ': np.zeros((5, 5)),
+    '^': np.array([
+        [0,0,1,0,0],
+        [0,1,0,1,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ])
 }
 
 def render_text(text: str, scale: int = 1) -> np.ndarray:
@@ -378,7 +385,7 @@ def vectorized_text(
     position: Tuple[int, int],
     color: Tuple[int, int, int] = (255, 255, 255),
     font_size: float = 0.5,
-    spacing: int = 1
+    spacing: float = 1.0
 ) -> np.ndarray:
     """
     Render text onto a NumPy array using optimized vectorized operations.
@@ -389,7 +396,7 @@ def vectorized_text(
         position (Tuple[int, int]): The (x, y) position to place the text.
         color (Tuple[int, int, int]): RGB color of the text.
         font_size (float): Font size, similar to CV2's font scale.
-        spacing (int): Spacing between characters.
+        spacing (float): Spacing between characters.
 
     Returns:
         np.ndarray: The image array with the text rendered on it.
@@ -397,7 +404,9 @@ def vectorized_text(
     x, y = position
     
     # Calculate scale based on font_size
-    scale = max(1, int(font_size * 2))
+    scale = int(font_size*2)
+    if scale < 1:
+        scale = 1
     
     # Render the entire text at once
     text_array = render_text(text, scale)
@@ -405,9 +414,21 @@ def vectorized_text(
     # Add spacing between characters
     if spacing > 0 and text:
         char_width = 5 * scale
-        total_width = text_array.shape[1] + spacing * (len(text) - 1)
+        # Calculate total width with fractional spacing
+        total_width = int(text_array.shape[1] + spacing * (len(text) - 1) * char_width)
         spaced_text_array = np.zeros((text_array.shape[0], total_width), dtype=text_array.dtype)
-        char_positions = np.arange(len(text)) * (char_width + spacing)
+        
+        # Adjust spacing for '.' character
+        char_positions = []
+        current_position = 0
+        for char in text:
+            char_positions.append(current_position)
+            if char == '.':
+                current_position += char_width  # No additional spacing for '.'
+            else:
+                current_position += char_width + int(spacing * char_width)
+        
+        char_positions = np.array(char_positions)
         spaced_text_array[:, char_positions[:, None] + np.arange(char_width)] = text_array.reshape(text_array.shape[0], -1, char_width)
         text_array = spaced_text_array
     
