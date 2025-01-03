@@ -1,26 +1,40 @@
 # Copyright (c) 2023 bedbad
 import numpy as np
 from typing import Tuple, Optional
-
-import cv2
-
-from .textrender import vectorized_text
 import functools
+import importlib
+from justpyplot.textrender import vectorized_text
 
-if __debug__:
+# Attempt to import optional modules
+def is_module_available(module_name):
+    try:
+        importlib.import_module(module_name)
+        return True
+    except ImportError:
+        return False
+
+cv2_available = is_module_available("cv2")
+perf_timer_available = is_module_available("perf_timer")
+PIL_available = is_module_available("PIL")
+
+if cv2_available:
+    import cv2
+
+if perf_timer_available:
     from perf_timer import PerfTimer
     perf_timers = {
-       '_veclinesperf' : PerfTimer('vectorized lines render'),
-        '_plotperf' : PerfTimer('full plot rendering')
+        '_veclinesperf': PerfTimer('vectorized lines render'),
+        '_plotperf': PerfTimer('full plot rendering')
     }
 else:
     perf_timers = {}
 
-def debug_performance(perf_name:str):
+
+def debug_performance(perf_name: str):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            if __debug__ and perf_name in perf_timers:
+            if perf_name in perf_timers:
                 with perf_timers[perf_name]:
                     result = func(*args, **kwargs)
                 return result
@@ -377,6 +391,8 @@ def plot2_at(
     return img_array
 
 
+
+
 @debug_performance('_plotperf')
 def plot2(
     values: np.array,
@@ -537,6 +553,7 @@ def plot2(
         img_array, title, (text_x_title, text_y_title), font, font_size, label_color, 1
     )
     return img_array
+
 
 
 @debug_performance('_plotperf')
@@ -1451,7 +1468,7 @@ def plot1_components(
     return figure, grid, labels, title_img
 
 @debug_performance('_plotperf')
-def plot_dict(
+def plot(
     values: np.array,
     grid: Optional[dict] = None,
     figure: Optional[dict] = None,
@@ -1487,7 +1504,10 @@ def plot_dict(
         'color': (128, 128, 128, 255),
         'label_color': (0, 0, 255, 255),
         'label_font_size': 0.6,
-        'precision': 2
+        'precision': 2,
+        'title_margin': 30,
+        'y_tick_offset': 5,
+        'x_tick_offset': 5
     }
 
     default_figure = {
@@ -1518,6 +1538,9 @@ def plot_dict(
     label_color = grid_style['label_color']
     label_font_size = grid_style['label_font_size']
     precision = grid_style['precision']
+    title_margin = grid_style['title_margin']
+    y_tick_offset = grid_style['y_tick_offset']
+    x_tick_offset = grid_style['x_tick_offset']
 
     # Extract figure options
     scatter = figure_style['scatter']
@@ -1565,8 +1588,9 @@ def plot_dict(
     
     adjusted_values = (values - bounds[:,0][:, np.newaxis]) * scale[:, np.newaxis]
 
-    y_scale = scale[1] if scale.ndim == 2 else scale
-    y_magnitude = 0 if np.all(y_scale == 0) else int(np.floor(np.log10(np.abs(y_scale[y_scale != 0]).max())))
+    # Calculate y magnitude based on the range of y values
+    y_range = bounds[1, 1] - bounds[1, 0]
+    y_magnitude = int(np.floor(np.log10(y_range))) if y_range != 0 else 0
 
     title += f', 10^{y_magnitude}'
 
@@ -1606,8 +1630,6 @@ def plot_dict(
     )
     valsx = x[valid_mask]
     valsy = y[valid_mask]
-    
-    marker_style = figure_style.get('marker_style', 'circle')
     
     if marker_style == 'circle':
         x_offset = np.arange(-r, r + 1)
@@ -1653,11 +1675,11 @@ def plot_dict(
         val = '{:.{}f}'.format(tick_value, precision)
         l = len(val)
         dx = int(l * 5 * label_font_size * 2)
-        text_x = grid_topleft[1] - dx
+        text_x = grid_topleft[1] - dx - y_tick_offset  # Apply y-axis offset
         text_y = grid_botright[0] - i * pxdelta[0] - int(5 * label_font_size)
         
         labels_img = vectorized_text(
-            labels_img, val, (text_x, text_y), color=tick_color, font_size=label_font_size
+            labels_img, val, (text_x, text_y), color=tick_color, font_size=label_font_size, spacing=0.2
         )
 
     # Render x-axis labels
@@ -1667,18 +1689,35 @@ def plot_dict(
         l = len(val)
         dy = int(5 * label_font_size * 2)
         text_x = grid_topleft[1] + i * pxdelta[1] - int(l * 2.5 * label_font_size)
-        text_y = grid_botright[0] + dy
+        text_y = grid_botright[0] + dy + x_tick_offset  # Apply x-axis offset
         
         labels_img = vectorized_text(
-            labels_img, val, (text_x, text_y), color=tick_color, font_size=label_font_size
+            labels_img, val, (text_x, text_y), color=tick_color, font_size=label_font_size, spacing=0.1 
         )
 
     # Draw title
     title_color = label_color[:3]
     text_x_title = grid_topleft[1] + (grid_botright[1] - grid_topleft[1]) // 2 - len(title) * 5 * int(label_font_size * 2) // 2
-    text_y_title = grid_topleft[0] - int(label_font_size * 5*2)
+    # Adjust the title's y-position to be closer to the grid
+    text_y_title = grid_topleft[0] - int(label_font_size*10)  # Reduced margin
+
     title_img = vectorized_text(
-        title_img, title, (text_x_title, text_y_title), color=title_color, font_size=label_font_size
+        title_img, title, (text_x_title, text_y_title), color=title_color, font_size=label_font_size, spacing=0.2
     )
 
     return figure_img, grid_img, labels_img, title_img
+
+if PIL_available:
+    from PIL import Image
+    from io import BytesIO
+    def blend2PIL(figure_img, grid_img, labels_img, title_img, format='PNG'):
+        figure_pil = Image.fromarray(figure_img, 'RGBA')
+        grid_pil = Image.fromarray(grid_img, 'RGBA')
+        labels_pil = Image.fromarray(labels_img, 'RGBA')
+        title_pil = Image.fromarray(title_img, 'RGBA')
+        blended_img = Image.alpha_composite(figure_pil, grid_pil)
+        blended_img = Image.alpha_composite(blended_img, labels_pil)
+        blended_img = Image.alpha_composite(blended_img, title_pil)
+        buffer = BytesIO()
+        blended_img.save(buffer, format=format)
+        return buffer

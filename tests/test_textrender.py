@@ -7,7 +7,7 @@ def test_text_rendering():
     img_array = np.zeros((300, 600, 3), dtype=np.uint8)
 
     # Test 1: Basic text rendering
-    img_array = vectorized_text(img_array, "HELLO WORLD", (50, 50), color=(255, 255, 255), scale=2)
+    img_array = vectorized_text(img_array, "JUST TEXT", (50, 50), color=(255, 255, 255), scale=2)
 
     # Test 2: Colored text
     img_array = vectorized_text(img_array, "RED TEXT", (50, 100), color=(0, 0, 255), scale=2)
