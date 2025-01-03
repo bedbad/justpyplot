@@ -16,7 +16,7 @@ classifiers=[
 Repository='https://github.com/bedbad/justpyplot'
 dependencies=[
   'numpy',
-  'opencv-python',
+  #'opencv-python',
 ]
 
 [project.optional-dependencies]
@@ -24,10 +24,14 @@ demo=[
   'mediapipe',
   'scipy'
 ]
+cv2 = ["opencv-python"]
+perf_timer = ["perf_timer"]
+PIL = ["PIL"]
 dev = [
     'ruff>=0.0.279',  # Specify the Ruff version
+    'perf_timer',
+    'opencv-python',
 ]
-
 [tool.ruff]
 line-length = 88
 
