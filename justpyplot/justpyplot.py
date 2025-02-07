@@ -391,8 +391,6 @@ def plot2_at(
     return img_array
 
 
-
-
 @debug_performance('_plotperf')
 def plot2(
     values: np.array,
@@ -553,7 +551,6 @@ def plot2(
         img_array, title, (text_x_title, text_y_title), font, font_size, label_color, 1
     )
     return img_array
-
 
 
 @debug_performance('_plotperf')
@@ -921,6 +918,36 @@ def plot1(
 
     return img_array
 
+
+def blend(*arrays)->np.ndarray:
+    """
+    Blends multiple NumPy arrays in the order they are provided.
+    
+    Parameters:
+    *arrays: Variable length argument list of NumPy arrays to be blended.
+    
+    Returns:
+    np.ndarray: The blended image if all arrays have the same dimensions,
+                otherwise returns the first array.
+    """
+    if not arrays:
+        raise ValueError("At least one array must be provided")
+
+    # Use the first array as the base
+    base_array = arrays[0]
+
+    # Check if all arrays have the same shape
+    for array in arrays:
+        if array.shape != base_array.shape:
+            return base_array
+
+    # Blend arrays by overlaying them in order
+    blended_array = base_array.copy()
+    for array in arrays[1:]:
+        alpha = array[..., 3] / 255.0  # Assuming the last channel is alpha
+        blended_array[..., :3] = (1 - alpha[..., None]) * blended_array[..., :3] + alpha[..., None] * array[..., :3]
+
+    return blended_array
 
 def blend_at(
     dst_img: np.ndarray, paste_img: np.ndarray, offset: Tuple[int, int]
@@ -1710,12 +1737,12 @@ def plot(
 if PIL_available:
     from PIL import Image
     from io import BytesIO
-    def blend2PIL(figure_img, grid_img, labels_img, title_img, format='PNG'):
+    def blend2PIL(grid_img, figure_img, labels_img, title_img, format='PNG'):
         figure_pil = Image.fromarray(figure_img, 'RGBA')
         grid_pil = Image.fromarray(grid_img, 'RGBA')
         labels_pil = Image.fromarray(labels_img, 'RGBA')
         title_pil = Image.fromarray(title_img, 'RGBA')
-        blended_img = Image.alpha_composite(figure_pil, grid_pil)
+        blended_img = Image.alpha_composite(grid_pil, figure_pil)
         blended_img = Image.alpha_composite(blended_img, labels_pil)
         blended_img = Image.alpha_composite(blended_img, title_pil)
         buffer = BytesIO()

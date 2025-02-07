@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 from justpyplot import justpyplot as jplt
 
+print(jplt.__file__)
+
 def test_plot():
     # Create a window
     cv2.namedWindow("Plot Test", cv2.WINDOW_NORMAL)
@@ -32,8 +34,8 @@ def test_plot():
 
     for i in range(10000):
         # Generate sample data
-        x = np.linspace(0, 4 * np.pi, 100)
-        y = np.sin(x + i * 0.1) * np.exp(-x / 10)
+        x = np.linspace(i * 0.1, 4 * np.pi+ i * 0.1, 100)
+        y = np.sin(x) * np.exp(-x / 10)
 
         # Define the title for each frame
         title = f"Dynamic Plot (Frame {i})"
@@ -49,7 +51,8 @@ def test_plot():
         )
 
         # Blend all components
-        blended = figure + grid + labels + title_img
+        # blended = grid + figure + labels + title_img
+        blended = jplt.blend(grid, figure, labels, title_img)
 
         # Convert to uint8 for display
         blended = blended.astype(np.uint8)
