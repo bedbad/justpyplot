@@ -4,12 +4,12 @@ Why not just have a simple API
 plot(values, grid_options, figure_options, ...) ->
 (__figures__, __grid__, __axis__,__labels__)
 
- which renders plot in numpy/tensors and you can overlay, mask, transform, publish in any way want whilst fully controlling every detail of your plot and figures?
+ which renders plot in numpy/tensors and you can overlay, mask, transform, publish in any way you want whilst fully controlling every detail of your plot and figures?
 
 <h1 align="center">JustPyPlot: Fast NumPy-Native Plotting</h1>
 
 
-## So Why Yes?
+## So Why?
 - **Fast**: Vectorized plotting directly to NumPy arrays - no memory screenshots or buffer copies
 A high-performance plotting library that renders directly to NumPy arrays. Measured 20-100x faster than matplotlib:
 ```bash
