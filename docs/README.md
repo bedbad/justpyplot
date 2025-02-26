@@ -13,7 +13,7 @@ pip install pdoc3
 From the root directory of the project, run:
 
 ```bash
-pdoc --html justpyplot -o docs/build
+pdoc --html justpyplot -o docs/build --only-modules
 ```
 
 This will:
@@ -63,7 +63,31 @@ def function_name(param1: type, param2: type) -> return_type:
 For release builds:
 
 ```bash
-pdoc --html justpyplot -o docs/build --template-dir docs/templates
+pdoc --html justpyplot -o docs/build --only-modules --template-dir docs/templates
 ```
 
-Documentation will be available at `docs/build/justpyplot/index.html` 
+Documentation will be available at `docs/build/justpyplot/index.html`
+
+## Read the Docs Integration
+
+1. Go to [Read the Docs](https://readthedocs.org/) and sign up/login
+2. Connect your GitHub repository
+3. Import your project from the dashboard
+4. The configuration in `.readthedocs.yaml` will:
+   - Install required dependencies
+   - Build documentation using pdoc3
+   - Deploy to readthedocs.io
+
+The documentation will automatically build when you push to the main branch.
+
+Build Status: [![Documentation Status](https://readthedocs.org/projects/justpyplot/badge/?version=latest)](https://justpyplot.readthedocs.io/en/latest/?badge=latest)
+
+## Troubleshooting
+
+If builds fail:
+1. Check the build logs on Read the Docs
+2. Verify all dependencies are in docs/requirements.txt
+3. Test the build command locally:
+   ```bash
+   pdoc --html justpyplot -o _readthedocs/html --only-modules
+   ``` 

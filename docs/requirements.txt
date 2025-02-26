@@ -1,0 +1,4 @@
+pdoc3
+numpy
+opencv-python
+Pillow 
