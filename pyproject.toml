@@ -4,7 +4,7 @@ build-backend = 'hatchling.build'
 
 [project]
 name='justpyplot'
-version='0.1.1'
+version='0.2.2'
 authors=[{ name='bedbad',email='antonyuk@bu.edu'}]
 description='Get your plot in you array, plot fast'
 readme='README.md'
@@ -16,7 +16,7 @@ classifiers=[
 Repository='https://github.com/bedbad/justpyplot'
 dependencies=[
   'numpy',
-  'opencv-python',
+  #'opencv-python',
 ]
 
 [project.optional-dependencies]
@@ -24,8 +24,29 @@ demo=[
   'mediapipe',
   'scipy'
 ]
+cv2 = ["opencv-python"]
+perf_timer = ["perf_timer"]
+PIL = ["PIL"]
 dev = [
     'ruff>=0.0.279',  # Specify the Ruff version
+    'perf_timer',
+    'opencv-python',
+]
+
+[tool.hatch.build]
+include = [
+  "justpyplot/*.py",
+  "examples/*",
+  "docs/*",
+  "LICENSE",
+]
+exclude = [
+  "README.md",
+  "tests/*",
+  "scripts/*",
+  "*.pyc",
+  "__pycache__",
+  "*.so"
 ]
 
 [tool.ruff]
