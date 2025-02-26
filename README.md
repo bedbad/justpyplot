@@ -1,9 +1,3 @@
-## Installation
-
-```bash
-pip install justpyplot
-```
-
 <h1 align="center">Why not just get your plots in numpy?! </h1>
 Why not just have a simple API
 
@@ -12,6 +6,10 @@ plot(values, grid_options, figure_options, ...) ->
 
  which renders plot in numpy/tensors and you can overlay, mask, transform, publish in any way you want whilst fully controlling every detail of your plot and figures?
 
+## Installation
+```bash
+pip install justpyplot
+```
 <h1 align="center">JustPyPlot: Fast NumPy-Native Plotting</h1>
 
 
