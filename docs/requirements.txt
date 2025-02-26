@@ -1,4 +1,5 @@
-pdoc3
+sphinx
+sphinx_rtd_theme
 numpy
 opencv-python
 Pillow 

@@ -1201,11 +1201,6 @@ def plot1_at(
     Returns:
         img_array: Image array with overlaid adaptive plot
 
-    Examples
-    --------
-    >>> frame = cv2.imread('frame.jpg')
-    >>> values = sensor_data[-100:]
-    >>> frame = draw_adaptive_plot(frame, values)
     """
     min_val = np.min(values)
     max_val = np.max(values)

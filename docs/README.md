@@ -5,38 +5,45 @@
 Install documentation dependencies:
 
 ```bash
-pip install pdoc3
+pip install -r docs/requirements.txt
 ```
+
+The requirements include:
+- sphinx
+- sphinx_rtd_theme
+- numpy
+- opencv-python
+- Pillow
 
 ## Building the Documentation
 
 From the root directory of the project, run:
 
 ```bash
-pdoc --html justpyplot -o docs/build --only-modules
+sphinx-build -b html docs docs/_build/html
 ```
 
 This will:
 1. Generate HTML documentation from docstrings
-2. Output files to docs/build directory
-3. Create searchable API documentation
+2. Create API reference automatically
+3. Output files to docs/_build/html directory
 
 ## Development
 
-When developing, you can use the live reload server:
+For live preview while writing documentation:
 
 ```bash
-pdoc --http localhost:8080 justpyplot
+sphinx-autobuild docs docs/_build/html
 ```
 
 This will:
-1. Start a local server
-2. Auto-reload when files change
-3. Show documentation updates in real-time
+1. Start a local server (usually at http://127.0.0.1:8000)
+2. Auto-rebuild when files change
+3. Auto-reload the browser
 
 ## Documentation Style Guide
 
-When writing docstrings, follow this format:
+Use NumPy style docstrings for all Python functions:
 
 ```python
 def function_name(param1: type, param2: type) -> return_type:
@@ -44,50 +51,52 @@ def function_name(param1: type, param2: type) -> return_type:
     
     Detailed description of function behavior.
     
-    Args:
-        param1: Description of first parameter
-        param2: Description of second parameter
+    Parameters
+    ----------
+    param1 : type
+        Description of first parameter
+    param2 : type
+        Description of second parameter
         
-    Returns:
+    Returns
+    -------
+    return_type
         Description of return value
         
-    Example:
-        >>> result = function_name(1, 2)
-        >>> print(result)
-        3
+    Examples
+    --------
+    >>> result = function_name(1, 2)
+    >>> print(result)
+    3
     """
 ```
 
-## Building for Distribution
+## Project Structure
 
-For release builds:
-
-```bash
-pdoc --html justpyplot -o docs/build --only-modules --template-dir docs/templates
 ```
-
-Documentation will be available at `docs/build/justpyplot/index.html`
+docs/
+├── conf.py          # Sphinx configuration
+├── index.rst        # Main documentation page
+├── requirements.txt # Documentation dependencies
+├── _build/         # Generated documentation
+└── _static/        # Static files (images, etc)
+```
 
 ## Read the Docs Integration
 
-1. Go to [Read the Docs](https://readthedocs.org/) and sign up/login
-2. Connect your GitHub repository
-3. Import your project from the dashboard
-4. The configuration in `.readthedocs.yaml` will:
-   - Install required dependencies
-   - Build documentation using pdoc3
-   - Deploy to readthedocs.io
-
-The documentation will automatically build when you push to the main branch.
-
-Build Status: [![Documentation Status](https://readthedocs.org/projects/justpyplot/badge/?version=latest)](https://justpyplot.readthedocs.io/en/latest/?badge=latest)
+The documentation automatically builds on [Read the Docs](https://readthedocs.org/) when you push to the main branch. Configuration is in `.readthedocs.yaml` at the root of the project.
 
 ## Troubleshooting
 
 If builds fail:
 1. Check the build logs on Read the Docs
 2. Verify all dependencies are in docs/requirements.txt
-3. Test the build command locally:
+3. Test locally with:
    ```bash
-   pdoc --html justpyplot -o _readthedocs/html --only-modules
+   sphinx-build -b html docs docs/_build/html -a -E
+   ```
+4. Clear build directory and rebuild:
+   ```bash
+   rm -rf docs/_build
+   sphinx-build -b html docs docs/_build/html
    ``` 
