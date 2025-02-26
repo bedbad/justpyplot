@@ -4,7 +4,7 @@ build-backend = 'hatchling.build'
 
 [project]
 name='justpyplot'
-version='0.1.1'
+version='0.2.2'
 authors=[{ name='bedbad',email='antonyuk@bu.edu'}]
 description='Get your plot in you array, plot fast'
 readme='README.md'
@@ -32,6 +32,23 @@ dev = [
     'perf_timer',
     'opencv-python',
 ]
+
+[tool.hatch.build]
+include = [
+  "justpyplot/*.py",
+  "examples/*",
+  "docs/*",
+  "LICENSE",
+]
+exclude = [
+  "README.md",
+  "tests/*",
+  "scripts/*",
+  "*.pyc",
+  "__pycache__",
+  "*.so"
+]
+
 [tool.ruff]
 line-length = 88
 

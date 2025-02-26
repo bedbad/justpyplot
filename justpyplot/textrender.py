@@ -384,7 +384,7 @@ def vectorized_text(
     text: str,
     position: Tuple[int, int],
     color: Tuple[int, int, int] = (255, 255, 255),
-    font_size: float = 0.5,
+    font_size: float = 1,
     spacing: float = 1.0
 ) -> np.ndarray:
     """
@@ -405,8 +405,8 @@ def vectorized_text(
     
     # Calculate scale based on font_size
     scale = int(font_size*2)
-    if scale < 1:
-        scale = 1
+    # if scale < 1:
+    # scale = 1
     
     # Render the entire text at once
     text_array = render_text(text, scale)

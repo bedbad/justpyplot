@@ -1,31 +1,65 @@
-from PIL import Image
-from justpyplot import justpyplot as jplt
 import numpy as np
+import pyvista as pv
+from justpyplot import justpyplot as jplt
+import time
 
+# Create plotter
+plotter = pv.Plotter()
+plotter.add_axes()
 
-def test_standalone():
-    x = np.linspace(0, 4*np.pi, 100)
-    y = np.sin(x) * np.exp(-x/10)
+def update_plot(phase=0):
+    # Create data
+    x = np.linspace(-10, 10, 100)
+    z = np.sin(x + phase)
+    plot_data = np.array([x, z])
 
-    figure, grid, labels, title = jplt.plot(
-        np.array([x, y]),
-        grid={'nticks': 10, 'color': (128, 128, 128, 255), 'label_color': (255, 0, 0, 255),'precision': 1, 'label_font_size': 0.9},
-        figure={'scatter':False,'point_color': (255, 0, 0, 255), 'point_radius':3, 'line_color':(0,64,64, 255), 'line_width': 2, 'marker_style':'circle'},
+    # Create 2D plot using jplt
+    plot_array = jplt.plot(
+        plot_data,
+        grid={'nticks': 5, 'color': (128, 128, 128, 255)},
+        figure={'scatter': False, 'line_color': (255, 0, 0, 255), 'line_width': 2},
         title='Sine Wave',
-        size=(300, 400),
-        max_len=100
+        size=(400, 300)
     )
+    blended = jplt.blend(*plot_array)
 
-    # Convert to uint8 for display
-    # blended = grid + figure + labels + title
-    blended = jplt.blend(grid, figure, labels, title)
-    blended = np.array(blended)
-    blended = blended.astype(np.uint8)
+    # Create a surface by rotating the sine wave
+    theta = np.linspace(0, 2*np.pi, 100)
+    x_grid, theta_grid = np.meshgrid(x, theta)
+    r = z  # use sine wave values as radius
+    y_grid = r * np.cos(theta_grid)
+    z_grid = r * np.sin(theta_grid)
 
-    blended_rgb = np.dstack((blended[:, :, 2], blended[:, :, 1], blended[:, :, 0]))
-    pil_image = Image.fromarray(blended_rgb)
-    pil_image.save("test.png")
+    # Create PyVista structured grid
+    grid = pv.StructuredGrid(x_grid, y_grid, z_grid)
 
+    # Map texture to plane
+    grid.texture_map_to_plane()
+    grid.active_texture = pv.numpy_to_texture(blended)
 
-if __name__ == "__main__":
-    test_standalone()
+    return grid
+
+# Set up the plotter for animation
+plotter.open_movie('animation.mp4', framerate=24)
+mesh = None
+phase = 0
+
+# Update every frame
+for i in range(120):  # More frames for smoother animation
+    if mesh:
+        plotter.remove_actor(mesh)
+    
+    grid = update_plot(phase)
+    mesh = plotter.add_mesh(grid)
+    
+    # Rotate camera
+    plotter.camera.azimuth = i * 3  # Rotate 3 degrees per frame
+    plotter.camera.elevation = 20  # Fixed elevation angle
+    
+    plotter.write_frame()
+    phase += 0.1  # Smaller phase increment for smoother wave motion
+    
+    # No sleep for smoother animation
+    
+# Close the plotter
+plotter.close()
