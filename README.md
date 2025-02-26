@@ -1,4 +1,10 @@
-<h1 align="center"># Why not just get your plots in numpy?! </h1>
+## Installation
+
+```bash
+pip install justpyplot
+```
+
+<h1 align="center">Why not just get your plots in numpy?! </h1>
 Why not just have a simple API
 
 plot(values, grid_options, figure_options, ...) ->
@@ -31,12 +37,6 @@ and put them on, in or into everwhere you need in 1-2 subsequent lines
 - **Real-time**: Was initially scrapped for computer vision and robotics for real-time visualization and physical debugging tasks where standard plotting failed
 
 - **ML/AI Pluggable**: You can, for example stick it onto visual layers of neural network for it to learn your plotted characteristic without changing any dimensions. 
-
-## Installation
-
-```bash
-pip install justpyplot
-```
 
 ## BASIC USAGE
 
