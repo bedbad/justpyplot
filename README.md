@@ -21,7 +21,7 @@ figure, grid, axis, labels = jplt.plot(values,grid_opts,figure_opts,title,(600, 
 ```
 and put them on, in or into everwhere you need in 1-2 subsequent lines
 
-- **Flexible**: Control every plot element (figures, grid, axis, labels) and every detail of plotting options independently
+- **Flexible**: Control every plot element (figures, grid, axis, labels) and every detail of plotting options independently, all design options are parsed from json-style figure and grid option dicts with full documentation available: https://justpyplot.readthedocs.io/en/latest/
 
 - **No dependencies**: Just vectorized python with numpy(+ other tensor lib you need), which makes standalone and compatible with any use case
 
@@ -81,9 +81,10 @@ while(cv2.waitKey(1) != 27):  # Press ESC to exit
 
 ### Overlaying Multiple Plots
 
-And then you take that and overlay, mask, stretch, transform and render at wherever in frame array/canvas/memory you need?
+ You take to take your plot which you can mask, stretch, transform and render wherever in frame array/canvas/memory you need and just overlay it simpler in one line?
 
-Here I took this concept implementation and stuck it on running mug neural network in 3 lines of code to mess with the detector in physical world (try in examples/mug_objectron/demo.py):
+Here 1-liner function implementing those basic steps stuck on running mug neural network.
+In 3 lines of code it shows how to mess and visually debug 3d position of computer vision/robotics object in physical world (try in examples/mug_objectron/demo.py):
 
 <p align="center">
   <img src="resources/demo.gif" alt="Overlaying multiple plots">
@@ -105,7 +106,7 @@ jplt.plot1_at(image,ang_xs,
 
 ### Jupyter Notebook Usage
 
-For jupyter support you can render images anyhow you like the simplest is to use the blend2PIL function depening on Pillow package which will blend all the plot layers into a single PIL image buffer which you can display
+For jupyter support you can render images anyhow you like. One of the simplest is to use the blend2PIL function depening on Pillow package which will blend all the plot layers into a single PIL image buffer which you display in notebook
 
 ```python
 import numpy as np
@@ -136,6 +137,10 @@ display(ipyImage(buffer.getvalue()))
 <p align="center">
   <img src="resources/jupyter_pil.png" alt="Jupyter Plot Output">
 </p>
+
+### Documentation
+
+Documentation is fully available at https://justpyplot.readthedocs.io/en/latest/
 
 
 
