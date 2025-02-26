@@ -5,6 +5,15 @@ import functools
 import importlib
 from justpyplot.textrender import vectorized_text
 
+__all__ = [
+    'plot',       # Main plotting function
+    'blend',      # Core blending function for numpy arrays
+    'blend2PIL',  # Specialized blending for Jupyter/PIL output
+    'plot_at',     # Plot directly onto existing array
+    'plot1_at',   # Plot 1D array onto existing array
+]
+
+
 # Attempt to import optional modules
 def is_module_available(module_name):
     try:
@@ -1192,10 +1201,11 @@ def plot1_at(
     Returns:
         img_array: Image array with overlaid adaptive plot
 
-    Example:
-        frame = cv2.imread('frame.jpg')
-        values = sensor_data[-100:]
-        frame = draw_adaptive_plot(frame, values)
+    Examples
+    --------
+    >>> frame = cv2.imread('frame.jpg')
+    >>> values = sensor_data[-100:]
+    >>> frame = draw_adaptive_plot(frame, values)
     """
     min_val = np.min(values)
     max_val = np.max(values)
@@ -1495,35 +1505,94 @@ def plot1_components(
     return figure, grid, labels, title_img
 
 @debug_performance('_plotperf')
-def plot(
-    values: np.array,
-    grid: Optional[dict] = None,
-    figure: Optional[dict] = None,
-    bounds: Optional[np.ndarray] = None,
-    title: str = 'Measuring',
-    size: Tuple[int, int] = (300, 300),
-    max_len: int = 100,
-    *args,
-    **kwargs
-) -> Tuple[np.array, np.array, np.array, np.array]:
-    """
-    Create a plot and return its components as separate NumPy arrays.
+def plot(values: np.array,
+         grid: dict = None,
+         figure: dict = None,
+         title: str = 'Plot',
+         size: Tuple[int, int] = (300, 300),
+         max_len: int = 100) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Generate plot components as separate RGBA numpy arrays.
 
-    Args:
-        values: np.array, the data to plot
-        grid: Optional[dict], styling options for the grid
-        figure: Optional[dict], styling options for the figure
-        bounds: Optional[np.ndarray], custom bounds for the plot (shape: (2, 2) for min/max of x and y)
-        title: str, title of the plot
-        size: Tuple[int, int], size of the plot
-        max_len: int, maximum number of data points to plot
+    Creates a plot from input values with customizable grid and figure options.
+    Returns separate arrays for figure, grid, labels and title that can be blended together.
 
-    Returns:
-        Tuple[np.array, np.array, np.array, np.array]: 
-            - figure: The main plot content (points and lines)
-            - grid: The grid lines
-            - labels: The axis labels
-            - title_img: The title image
+    Parameters
+    ----------
+    values : np.array
+        2D array of shape (2, N) containing x and y coordinates
+    grid : dict, optional
+        Grid customization options:
+
+        nticks : int
+            Number of grid divisions (default: 10)
+
+        color : tuple
+            RGBA color for grid lines (default: (128, 128, 128, 255))
+
+        label_color : tuple
+            RGBA color for axis labels (default: (0, 0, 255, 255))
+
+        label_font_size : float
+            Font size for axis labels (default: 0.4)
+
+        precision : int
+            Decimal precision for axis labels (default: 2)
+
+        title_margin : int
+            Margin above title in pixels (default: 30)
+
+        y_tick_offset : int
+            Offset for y-axis labels (default: 5)
+
+        x_tick_offset : int
+            Offset for x-axis labels (default: 5)
+
+    figure : dict, optional
+        Figure customization options:
+
+        scatter : bool
+            Whether to draw points (default: False)
+
+        line_color : tuple
+            RGBA color for lines (default: (255, 0, 0, 255))
+
+        line_width : int
+            Width of lines in pixels (default: 2)
+
+        point_color : tuple
+            RGBA color for points (default: (0, 255, 0, 255))
+
+        point_radius : int
+            Radius of points in pixels (default: 3)
+
+        marker_style : str
+            Point marker style ('circle', 'cross', etc) (default: 'circle')
+
+        line_thickness : int
+            Thickness of connecting lines (default: 2)
+
+        line_style : str
+            Line style ('solid', 'dashed', etc) (default: 'solid')
+
+    title : str, optional
+        Plot title (default: 'Plot')
+    size : tuple of int
+        (width, height) of plot in pixels (default: (300, 300))
+    max_len : int, optional
+        Maximum number of points to plot (default: 100)
+
+    Returns
+    -------
+    tuple of np.ndarray
+        (figure_array, grid_array, labels_array, title_array)
+        Each array has shape (height, width, 4) with RGBA channels
+
+    Examples
+    --------
+    >>> x = np.linspace(0, 10, 50)
+    >>> y = np.sin(x)
+    >>> plot_arrays = plot(np.array([x, y]))
+    >>> final_image = blend(*plot_arrays)
     """
     # Default values from plot1_components
     default_grid = {
@@ -1737,14 +1806,52 @@ def plot(
 if PIL_available:
     from PIL import Image
     from io import BytesIO
-    def blend2PIL(grid_img, figure_img, labels_img, title_img, format='PNG'):
-        figure_pil = Image.fromarray(figure_img, 'RGBA')
-        grid_pil = Image.fromarray(grid_img, 'RGBA')
-        labels_pil = Image.fromarray(labels_img, 'RGBA')
-        title_pil = Image.fromarray(title_img, 'RGBA')
+    def blend2PIL(arrays, format='PNG') -> BytesIO:
+        """Blend multiple arrays into a PIL image buffer.
+
+        Optimized blending function for Jupyter notebook display that converts
+        plot components directly to a PIL image buffer. Requires the Pillow (PIL)
+        package to be installed.
+
+        Parameters
+        ----------
+        arrays : tuple of np.ndarray
+            Tuple of RGBA arrays to blend:
+            - figure_array: Plot figure components
+            - grid_array: Grid lines and background
+            - labels_array: Axis labels and ticks
+            - title_array: Plot title
+            Each array should have shape (height, width, 4) with RGBA channels
+
+        format : str, optional
+            Output image format ('PNG', 'JPEG', etc) (default: 'PNG')
+
+        Returns
+        -------
+        BytesIO
+            Buffer containing the blended image in specified format
+
+        Raises
+        ------
+        ImportError
+            If Pillow package is not installed
+        ValueError
+            If input arrays have different shapes
+
+        Examples
+        --------
+        >>> plot_arrays = plot(np.array([x, y]))
+        >>> buffer = blend2PIL(plot_arrays)
+        >>> display(Image(buffer.getvalue()))  # Jupyter display
+        """
+        figure_pil = Image.fromarray(arrays[0], 'RGBA')
+        grid_pil = Image.fromarray(arrays[1], 'RGBA')
+        labels_pil = Image.fromarray(arrays[2], 'RGBA')
+        title_pil = Image.fromarray(arrays[3], 'RGBA')
         blended_img = Image.alpha_composite(grid_pil, figure_pil)
         blended_img = Image.alpha_composite(blended_img, labels_pil)
         blended_img = Image.alpha_composite(blended_img, title_pil)
         buffer = BytesIO()
         blended_img.save(buffer, format=format)
         return buffer
+
