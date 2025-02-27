@@ -4,7 +4,7 @@ build-backend = 'hatchling.build'
 
 [project]
 name='justpyplot'
-version='0.2.2'
+version='0.2.3'
 authors=[{ name='bedbad',email='antonyuk@bu.edu'}]
 description='Get your plot in you array, plot fast'
 readme='README.md'
