@@ -1752,13 +1752,20 @@ def plot(values: np.array,
         xx, yy = np.meshgrid(x_offset, y_offset)
         mask = xx**2 + yy**2 <= r**2
 
+    #mask to separate shape out of bounded rectangle
     xx = xx[mask]
     yy = yy[mask]
 
+    # 1st - despise the term 'ravel', its more 'unravel' and even more 'straighten'
+    # 2nd - this hack allows stamped form vectorized rendering
+    # by using the fact that reshaped indexing on both pairs keeps matching exactly
     xx = xx.reshape(1, -1) + valsx.reshape(-1, 1)
     yy = yy.reshape(1, -1) + valsy.reshape(-1, 1)
-
+    # now all point pixels are there in straightened form
+    
+    #cut out pixels that are out of bounds
     valid_points = (0 <= xx) & (xx < figure_img.shape[1]) & (0 <= yy) & (yy < figure_img.shape[0])
+    #fold points back into plot tensor asigning their places color
     figure_img[yy[valid_points], xx[valid_points]] = point_color
 
 
