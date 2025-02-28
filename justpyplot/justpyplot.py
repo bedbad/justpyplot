@@ -1505,7 +1505,7 @@ def plot(values: np.array,
          figure: dict = None,
          title: str = 'Plot',
          size: Tuple[int, int] = (300, 300),
-         bounds: list = None,
+         bounds: Optional[np.ndarray] = None,
          max_len: int = 100) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Generate plot components as separate RGBA numpy arrays.
 
@@ -1574,6 +1574,8 @@ def plot(values: np.array,
         Plot title (default: 'Plot')
     size : tuple of int
         (width, height) of plot in pixels (default: (300, 300))
+    bounds: Optional[np.ndarray] = None,
+        Custom bounds for the plot (shape==(values.shape[-1], 2) for min/max of x and y)
     max_len : int, optional
         Maximum number of points to plot (default: 100)
 
