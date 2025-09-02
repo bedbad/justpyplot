@@ -104,7 +104,7 @@ jplt.plot1_at(image,ang_xs,
 
 ### Jupyter Notebook Usage
 
-For jupyter support you can render images anyhow you like. One of the simplest is to use the blend2PIL function depening on Pillow package which will blend all the plot layers into a single PIL image buffer which you display in notebook
+For jupyter support you can render images out how you like. One of the simplest is to use the blend2PIL function depening on Pillow package which will blend all the plot layers into a single PIL image buffer which you display in notebook
 
 ```python
 import numpy as np
